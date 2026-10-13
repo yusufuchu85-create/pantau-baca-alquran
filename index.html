@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111815" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Dashboard laporan bulanan baca Al-Qur'an siswa Muslim per kelas di sekolah binaan.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
 <title>Dashboard Laporan Baca Al-Qur'an – Sekolah Binaan</title>
 <style>
 :root{
@@ -101,6 +109,53 @@ svg text{fill:var(--muted);font-size:11px}
 .pend{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .cks{display:flex;flex-wrap:wrap;gap:8px}.ck{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;cursor:pointer}.ck input{width:18px;height:18px;min-height:0}
 .who{display:flex;gap:10px;align-items:center;background:var(--track);border-radius:10px;padding:10px 12px;margin-top:10px}
+
+/* ---------- Penyempurnaan untuk Google Chrome (HP & laptop) ---------- */
+:root{color-scheme:light dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scrollbar-gutter:stable;scroll-behavior:smooth}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+button,select,input,textarea,.ck,.cls button,tr.clk{touch-action:manipulation}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);scrollbar-width:none;scroll-snap-type:x proximity;margin-left:-16px;margin-right:-16px;padding:0 16px}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{scroll-snap-align:start;min-height:44px}
+nav.tabs button:hover{color:var(--ink)}
+.btn,.cls button,.ck{transition:background-color .15s,border-color .15s,transform .05s}
+.btn:hover:not(:disabled){border-color:var(--brand)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+select{cursor:pointer}
+.scroll{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+thead th{position:sticky;top:0;background:var(--card);z-index:1}
+tbody tr:last-child td{border-bottom:0}
+.kpi .v,.calc b,td.n{font-variant-numeric:tabular-nums}
+@media (max-width:640px){
+  .wrap{padding:14px 12px 72px}
+  nav.tabs{margin-left:-12px;margin-right:-12px;padding:0 12px}
+  input[type=month],input[type=text],input[type=number],select,textarea{font-size:16px}
+  .btn{min-height:44px}
+  .bar .field{flex:1 1 100%}
+  .kpi .v{font-size:26px}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+}
+@media (hover:none){.btn.sm{min-height:40px}}
+@media (min-width:900px){.kpis{grid-template-columns:repeat(4,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+noscript{display:block;padding:20px;text-align:center}
+@media print{
+  @page{margin:12mm}
+  :root{padding:0}
+  body{background:#fff;color:#000;font-size:12px}
+  nav.tabs,#banner,#toast,.bar,.btn,.cls,.no-print{display:none!important}
+  .wrap{max-width:none;padding:0}
+  .card,.kpi{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .scroll{overflow:visible}
+  table{min-width:0}
+  th,td{white-space:normal}
+  thead th{position:static}
+  .meter .t,.meter .t i,.chip,.kpi{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -112,7 +167,7 @@ svg text{fill:var(--muted);font-size:11px}
     <h1>Laporan Bulanan Baca Al-Qur'an<small>Dilaporkan oleh guru kelas · siswa Muslim, bisa membaca, dan belum bisa membaca Al-Qur'an per kelas</small></h1>
   </header>
   <div id="banner"></div>
-  <nav class="tabs" id="tabs">
+  <nav class="tabs" id="tabs" aria-label="Menu utama">
     <button data-tab="input">Lapor (Guru Kelas)</button>
     <button data-tab="daftar">Daftar Guru</button>
     <button data-tab="kepsek">Daftar Kepala Sekolah</button>
@@ -120,9 +175,10 @@ svg text{fill:var(--muted);font-size:11px}
     <button data-tab="ringkas">Dashboard</button>
     <button data-tab="sekolah">Kelola Sekolah</button>
   </nav>
+  <noscript>Aktifkan JavaScript di Chrome agar aplikasi ini dapat berjalan.</noscript>
   <main id="view"><div class="empty">Memuat data…</div></main>
 </div>
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
