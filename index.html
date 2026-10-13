@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard Laporan Baca Al-Qur'an – Sekolah Binaan</title>
+<style>
+:root{
+  --bg:#f6f7f4; --card:#ffffff; --ink:#1d2a24; --muted:#6a766f; --line:#e1e6e0;
+  --brand:#14694a; --brand-ink:#ffffff; --ok:#1f8a5b; --ok-soft:#dff3e9;
+  --warn:#d98e04; --warn-soft:#fbefd2; --bad:#c0392b; --bad-soft:#fbe3df; --track:#ecefea;
+  --shadow:0 1px 2px rgba(20,40,30,.06),0 4px 14px rgba(20,40,30,.05);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111815; --card:#1a2420; --ink:#e8efe9; --muted:#9aa8a0; --line:#2b3832;
+    --brand:#3cae83; --brand-ink:#08140f; --ok:#4bc08f; --ok-soft:#1b3a2d;
+    --warn:#f0b03a; --warn-soft:#3b2f12; --bad:#ef7a6c; --bad-soft:#40201c; --track:#26322c;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111815; --card:#1a2420; --ink:#e8efe9; --muted:#9aa8a0; --line:#2b3832;
+  --brand:#3cae83; --brand-ink:#08140f; --ok:#4bc08f; --ok-soft:#1b3a2d;
+  --warn:#f0b03a; --warn-soft:#3b2f12; --bad:#ef7a6c; --bad-soft:#40201c; --track:#26322c;
+  --shadow:none;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 16px 60px}
+header.top{margin-bottom:14px}
+h1{font-size:20px;margin:0;line-height:1.25}
+h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}
+h2{font-size:16px;margin:0 0 10px}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+nav.tabs button{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:inherit;font-weight:600;padding:10px 12px;cursor:pointer;white-space:nowrap}
+nav.tabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:150px}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+select,input[type=month],input[type=text],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:42px;width:100%}
+textarea{min-height:110px;resize:vertical}
+select:focus,input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.btn{font:inherit;font-weight:600;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;min-height:42px;cursor:pointer}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:5px 10px;min-height:32px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.spacer{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .l{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.15;margin-top:2px}
+.kpi .s{font-size:12.5px;color:var(--muted)}
+.kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--warn)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:600px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.clk{cursor:pointer} tr.clk:hover td{background:var(--track)}
+tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:0}
+.meter{display:flex;align-items:center;gap:8px;min-width:150px}
+.meter .t{flex:1;height:10px;background:var(--bad-soft);border-radius:99px;overflow:hidden;display:flex}
+.meter .t i{display:block;height:100%;background:var(--ok)}
+.meter b{font-size:13px;min-width:46px;text-align:right}
+.chip{display:inline-block;border-radius:99px;padding:2px 9px;font-size:12px;font-weight:700}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.no{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.banner{border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:14px;background:var(--warn-soft)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.school-item{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
+.school-item:last-child{border-bottom:0}
+.school-item .m{color:var(--muted);font-size:13px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:9;max-width:90vw}
+svg text{fill:var(--muted);font-size:11px}
+.hint{font-size:12.5px;color:var(--muted)}
+.form-narrow{max-width:560px}
+.bigin input{font-size:20px;font-weight:700;min-height:52px;text-align:right}
+.calc{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.calc div{flex:1;min-width:130px;background:var(--track);border-radius:10px;padding:10px 12px}
+.calc small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.calc b{font-size:22px}
+.err{border-color:var(--bad)!important;background:var(--bad-soft)!important}
+.cls{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.cls button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer}
+.cls button.done{border-color:var(--ok);background:var(--ok-soft)}
+.cls button.cur{outline:2px solid var(--brand)}
+.miss{padding:8px 0;border-bottom:1px solid var(--line)} .miss:last-child{border-bottom:0}
+.as-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start;padding:10px 0;border-top:1px dashed var(--line)}
+.as-ctl{display:flex;flex-direction:column;gap:6px;min-width:240px;flex:1;max-width:380px}
+.as-res{display:flex;flex-wrap:wrap;gap:6px}
+.pend{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.cks{display:flex;flex-wrap:wrap;gap:8px}.ck{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;cursor:pointer}.ck input{width:18px;height:18px;min-height:0}
+.who{display:flex;gap:10px;align-items:center;background:var(--track);border-radius:10px;padding:10px 12px;margin-top:10px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Laporan Bulanan Baca Al-Qur'an<small>Dilaporkan oleh guru kelas · siswa Muslim, bisa membaca, dan belum bisa membaca Al-Qur'an per kelas</small></h1>
+  </header>
+  <div id="banner"></div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="input">Lapor (Guru Kelas)</button>
+    <button data-tab="daftar">Daftar Guru</button>
+    <button data-tab="kepsek">Daftar Kepala Sekolah</button>
+    <button data-tab="dinas">Dinas</button>
+    <button data-tab="ringkas">Dashboard</button>
+    <button data-tab="sekolah">Kelola Sekolah</button>
+  </nav>
+  <main id="view"><div class="empty">Memuat data…</div></main>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var BULAN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+var now=new Date();
+var curYM=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+var LS_KEY="lapor-quran-guru";
+
+var S={dinasRaw:{},dn:{nama:null,inst:""},schools:[],reports:{},reportsList:[],tab:"input",month:curYM,scope:"all",ready:false,mode:"loading",canWrite:true,canAdmin:true,
+  g:{school:"",kelas:"",month:curYM,muslim:"",bisa:"",pelapor:"",dirty:false,loadedKey:"",prefilled:false},
+  edit:{id:null,nama:"",jenjang:"SD/MI",kelas:""},confirmDel:null,myId:null,myName:"",names:{},raw:{},assignOpen:null,regRaw:{},dec:{},reg:{school:"",sel:{},extra:"",nama:null},prof:{nama:null,nd:false,k:{}}};
+var repo=null,dl=null,loaded={sekolah:false,laporan:false,p:false,d:false};
+var COL_S="sekolah",COL_R="laporan_guru",COL_P="pendaftaran",COL_D="keputusan",COL_N="dinas";
+var userNs=null;
+
+/* ---------- KONFIGURASI (isi sesuai panduan) ---------- */
+var FIREBASE_CONFIG={apiKey:"AIzaSyC1lqFQSoK2lCXmLcXJCSDRT4jTW6sEsLU",authDomain:"laporan-quran.firebaseapp.com",projectId:"laporan-quran",appId:"1:984150028452:web:5db34cf4907ae705f3f631"};
+var ADMIN_EMAILS=["buktikerja.makmurnonci@gmail.com"]; /* boleh lebih dari satu; harus sama dengan di Firestore Rules */
+
+/* ---------- Firebase (GitHub Pages) ---------- */
+function fbOn(){return !!(window.firebase&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.apiKey.indexOf("ISI")!==0);}
+function showLogin(){
+  S.needLogin=true;var tb0=$("tabs");if(tb0)tb0.style.display="none";
+  var bn=$("banner");if(bn)bn.innerHTML="";
+  $("view").innerHTML='<div class="card form-narrow"><h2>Masuk</h2><p class="hint" style="margin-top:0">Masuk dengan akun Google Anda untuk melapor, mendaftar sebagai guru kelas, atau mengelola sekolah (admin).</p><button class="btn primary" data-action="login">Masuk dengan Google</button></div><div class="card form-narrow"><h2>Kepala Sekolah?</h2><p class="hint" style="margin-top:0">Belum terdaftar? Masuk dengan akun Google Anda, lalu langsung ke formulir pendaftaran kepala sekolah.</p><button class="btn" data-action="login-kepsek">Daftar sebagai Kepala Sekolah</button></div>';
+}
+async function fbStart(){
+  firebase.initializeApp(FIREBASE_CONFIG);
+  var auth=firebase.auth(),fs=firebase.firestore();
+  window.__auth=auth;
+  var u=await new Promise(function(res){auth.onAuthStateChanged(function(x){if(x)res(x);else showLogin();});});
+  S.needLogin=false;var tb1=$("tabs");if(tb1)tb1.style.display="";
+  var email=(u.email||"").toLowerCase();
+  var isAdmin=ADMIN_EMAILS.some(function(a){return String(a).toLowerCase()===email;});
+  S.email=u.email||"";
+  try{await fs.doc("pengguna/"+u.uid).set({name:u.displayName||u.email||"Guru",email:u.email||""},{merge:true});}catch(e){}
+  var user={
+    can:async function(){return true;},
+    canEdit:async function(){return isAdmin;},
+    me:async function(){return {id:u.uid,name:u.displayName||u.email||"Guru"};},
+    profiles:async function(ids){
+      var out={};
+      await Promise.all(ids.map(function(id){return fs.doc("pengguna/"+id).get().then(function(d){if(d.exists)out[id]={name:d.data().name||""};}).catch(function(){});}));
+      return out;
+    },
+    search:async function(q){
+      var snap=await fs.collection("pengguna").get(),ql=String(q||"").toLowerCase(),hits=[];
+      snap.forEach(function(d){var x=d.data(),nm=x.name||x.email||"";if(!ql||nm.toLowerCase().indexOf(ql)>=0||String(x.email||"").toLowerCase().indexOf(ql)>=0)hits.push({id:d.id,name:nm});});
+      return hits.slice(0,8);
+    }
+  };
+  var dlx={save:function(o){
+    return new Promise(function(res){
+      var b=new Blob([o.data],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");
+      a.href=URL.createObjectURL(b);a.download=o.filename;document.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();res();},300);
+    });
+  }};
+  return {db:fs,user:user,dl:dlx};
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function $(id){return document.getElementById(id);}
+function ymLabel(ym){var p=ym.split("-");return BULAN[+p[1]-1]+" "+p[0];}
+function shiftYM(ym,n){var p=ym.split("-");var d=new Date(+p[0],+p[1]-1+n,1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+function toInt(v){var n=parseInt(v,10);return isNaN(n)||n<0?0:n;}
+function fmt(n){return n.toLocaleString("id-ID");}
+function pct(b,m){return m>0?Math.round(b/m*1000)/10:null;}
+function pctTxt(p){return p==null?"–":p.toLocaleString("id-ID",{minimumFractionDigits:0,maximumFractionDigits:1})+"%";}
+function uid(){return "s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function slug(s){
+  var x=String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  if(x)return x;
+  var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return "k"+Math.abs(h).toString(36);
+}
+function tgl(ts){return ts?new Date(ts).toLocaleDateString("id-ID",{day:"numeric",month:"short"}):"";}
+function sortedSchools(){return S.schools.slice().sort(function(a,b){return String(a.nama).localeCompare(String(b.nama),"id");});}
+function schoolById(id){for(var i=0;i<S.schools.length;i++)if(S.schools[i].id===id)return S.schools[i];return null;}
+function managed(){return S.schools.filter(function(s){return s.kepsekId&&s.kepsekId===S.myId;});}
+function isDinas(){var d=S.myId&&S.dinasRaw[S.myId];return S.mode==="shared"&&!S.canAdmin&&!!d&&d.aktif===true&&managed().length===0;}
+function isMgr(){return S.mode!=="shared"?S.canAdmin:(S.canAdmin||managed().length>0);}
+function manages(sid){if(S.canAdmin)return true;var s=schoolById(sid);return !!(s&&s.kepsekId&&s.kepsekId===S.myId);}
+function visSchools(){
+  var a=sortedSchools();
+  if(isDinas())return a;
+  if(S.mode!=="shared"||S.canAdmin)return a;
+  var out=[];
+  a.forEach(function(s){
+    if(manages(s.id)){out.push(s);return;}
+    var own=s.kelas.filter(function(k){return k.guruId&&k.guruId===S.myId;});
+    if(own.length)out.push({id:s.id,nama:s.nama,jenjang:s.jenjang,kepsekId:s.kepsekId,kelas:own});
+  });
+  return out;
+}
+function strip(o){var x=Object.assign({},o||{});delete x.id;return x;}
+function regDoc(req,nama){var cur=S.regRaw[S.myId]||{},o={requests:req,nama:nama};if(cur.kepsek)o.kepsek=cur.kepsek;if(cur.dinas)o.dinas=cur.dinas;return o;}
+function normSchool(d){
+  var kel=(d.kelas||[]).map(function(k){return typeof k==="string"?{id:slug(k),nama:k,guruId:null}:{id:String(k.id),nama:String(k.nama),guruId:k.guruId?String(k.guruId):null};});
+  return {id:d.id,nama:d.nama||"",jenjang:d.jenjang||"",kelas:kel,kepsekId:d.kepsekId||null};
+}
+function crep(sid,kid,ym){return S.reports[sid+"_"+kid+"_"+ym]||null;}
+function schoolStats(s,ym){
+  var m=0,b=0,done=0;
+  s.kelas.forEach(function(k){var r=crep(s.id,k.id,ym);if(r){done++;var mm=toInt(r.muslim);m+=mm;b+=Math.min(toInt(r.bisa),mm);}});
+  return {m:m,b:b,n:m-b,done:done,total:s.kelas.length};
+}
+function toast(msg){var t=$("toast");t.innerHTML='<div class="toast">'+esc(msg)+'</div>';clearTimeout(toast._t);toast._t=setTimeout(function(){t.innerHTML="";},2800);}
+function typedName(id){var dd=S.dec[id];if(dd&&dd.nama)return String(dd.nama);var d=S.regRaw[id];return d&&d.nama?String(d.nama):"";}
+function nameOf(id){return id?(typedName(id)||S.names[id]||"Guru"):"";}
+function guruTxt(k){return k.guruId?nameOf(k.guruId):"";}
+function reporterName(r){return S.mode==="shared"?nameOf(r._by):(r.pelapor||"–");}
+function allowed(){
+  var out=[];
+  sortedSchools().forEach(function(s){s.kelas.forEach(function(k){
+    if(S.mode==="local"||S.canAdmin||(S.myId&&k.guruId===S.myId))out.push({s:s,k:k});
+  });});
+  return out;
+}
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS_KEY)||"{}");}catch(e){return {};}}
+function lsSet(o){try{localStorage.setItem(LS_KEY,JSON.stringify(o));}catch(e){}}
+
+/* ---------- storage adapters ---------- */
+function localRepo(){
+  var mem={sekolah:{},laporan_guru:{}},subs={sekolah:[],laporan_guru:[]};
+  try{var raw=localStorage.getItem("lapor-quran-v3");if(raw){var o=JSON.parse(raw);mem.sekolah=o.sekolah||{};mem.laporan_guru=o.laporan_guru||{};}}catch(e){}
+  function persist(){try{localStorage.setItem("lapor-quran-v3",JSON.stringify(mem));}catch(e){}}
+  function list(c){return Object.keys(mem[c]).map(function(id){var d=JSON.parse(JSON.stringify(mem[c][id]));d.id=id;return d;});}
+  function emit(c){subs[c].forEach(function(f){f(list(c));});}
+  return {
+    subscribe:function(c,f){subs[c].push(f);setTimeout(function(){f(list(c));},0);},
+    set:function(c,id,d){mem[c][id]=d;persist();emit(c);return Promise.resolve();},
+    del:function(c,id){delete mem[c][id];persist();emit(c);return Promise.resolve();}
+  };
+}
+function dbRepo(db){
+  return {
+    subscribe:function(c,f){
+      return db.collection(c).onSnapshot(function(s){f(s.docs.map(function(d){var o=Object.assign({},d.data());o.id=d.id;return o;}));},
+        function(e){toast("Gagal memuat data ("+(e&&e.code||"error")+")");});
+    },
+    subscribeDoc:function(c,id,f){
+      return db.doc(c+"/"+id).onSnapshot(function(d){var o=null;if(d.exists){o=Object.assign({},d.data());o.id=d.id;}f(o?[o]:[]);},
+        function(e){toast("Gagal memuat data ("+(e&&e.code||"error")+")");});
+    },
+    set:function(c,id,d){return db.doc(c+"/"+id).set(d);},
+    del:function(c,id){return db.doc(c+"/"+id).delete();}
+  };
+}
+function writeFail(e){
+  if(e&&e.code==="invalid_argument"){toast("Anda tidak punya izin untuk mengubah data ini.");}
+  else toast("Gagal menyimpan"+(e&&e.code?" ("+e.code+")":"")+". Coba lagi.");
+}
+
+/* ---------- chrome ---------- */
+function renderBanner(){
+  var h="";
+  if(S.mode==="local")h+='<div class="banner">Mode lokal: data hanya tersimpan di browser ini. Hubungkan Firebase (isi FIREBASE_CONFIG di berkas ini) agar laporan semua guru terkumpul di satu tempat.</div>';
+  if(window.__auth&&S.mode==="shared")h+='<div class="hint" style="margin-bottom:10px">Masuk sebagai <b>'+esc(S.email||S.myName)+'</b> ('+(S.canAdmin?"admin":(managed().length?"kepala sekolah":(isDinas()?"Dinas, hanya lihat":"guru")))+') · <button class="btn sm" data-action="logout">Keluar</button></div>';
+  if(S.mode==="shared"&&!S.canWrite)h+='<div class="banner">Anda hanya punya akses lihat. Minta pemilik membagikan sebagai <b>Contributor</b> agar bisa mengirim laporan.</div>';
+  $("banner").innerHTML=h;
+}
+function render(){
+  if(S.needLogin){showLogin();return;}
+  renderBanner();
+  var isK=S.mode==="shared"&&!S.canAdmin&&managed().length>0;
+  var isG=S.mode==="shared"&&!S.canAdmin&&!isK&&!!S.myId&&allowed().length>0;
+  var isDn=isDinas()&&!isG;
+  if(isK&&(S.tab==="input"||S.tab==="daftar"||S.tab==="kepsek"))S.tab="ringkas";
+  if(isG&&(S.tab==="daftar"||S.tab==="kepsek"))S.tab="input";
+  if(isDn&&(S.tab==="input"||S.tab==="daftar"||S.tab==="kepsek"))S.tab="ringkas";
+  if((isK||isG)&&S.tab==="dinas")S.tab=isK?"ringkas":"input";
+  var tabs=document.querySelectorAll("#tabs button");
+  for(var i=0;i<tabs.length;i++){
+    var tn=tabs[i].getAttribute("data-tab");
+    tabs[i].classList.toggle("on",tn===S.tab);
+    if(tn!=="sekolah"&&tn!=="ringkas")tabs[i].style.display=((isK&&(tn==="input"||tn==="daftar"||tn==="kepsek"))||(isG&&(tn==="daftar"||tn==="kepsek"))||(isDn&&(tn==="input"||tn==="daftar"||tn==="kepsek"))||((isK||isG)&&tn==="dinas"))?"none":"";
+    if(tn==="sekolah"){
+      tabs[i].style.display=!isMgr()?"none":"";
+      var np=(S.mode==="shared"&&isMgr()&&S.ready)?pendingList().length+(S.canAdmin?pendingKS().length+pendingDN().length:0):0;
+      tabs[i].textContent=(S.canAdmin?"Kelola Sekolah":"Persetujuan Guru")+(np?" ("+np+")":"");
+    }
+  }
+  if(S.tab==="sekolah"&&!isMgr())S.tab="input";
+  if(!S.ready){$("view").innerHTML='<div class="empty">Memuat data…</div>';return;}
+  if(S.scope!=="all"&&!schoolById(S.scope))S.scope="all";
+  if(S.tab==="ringkas")renderDash();
+  else if(S.tab==="input")renderInput();
+  else if(S.tab==="daftar")renderDaftar();
+  else if(S.tab==="kepsek")renderKepsekDaftar();
+  else if(S.tab==="dinas")renderDinas();
+  else if(S.canAdmin||S.mode!=="shared")renderSchools();
+  else renderKepsek();
+}
+
+/* ---------- Dashboard ---------- */
+function meter(b,m){
+  var p=pct(b,m);
+  return '<div class="meter"><div class="t">'+(p==null?"":'<i style="width:'+p+'%"></i>')+'</div><b>'+pctTxt(p)+'</b></div>';
+}
+function statusChip(st){
+  if(st.total>0&&st.done===st.total)return '<span class="chip ok">Lengkap '+st.done+'/'+st.total+'</span>';
+  if(st.done>0)return '<span class="chip no">Sebagian '+st.done+'/'+st.total+'</span>';
+  return '<span class="chip bad">Belum lapor</span>';
+}
+function renderDash(){
+  var schools=visSchools();
+  if(S.mode==="shared"&&!S.canAdmin&&schools.length===1&&S.scope==="all")S.scope=schools[0].id;
+  if(!schools.length&&S.mode==="shared"&&!S.canAdmin&&sortedSchools().length){$("view").innerHTML='<div class="card empty form-narrow"><h2>Dashboard belum tersedia</h2><p>Dashboard tampil setelah pendaftaran Anda sebagai guru kelas disetujui.</p></div>';return;}
+  if(!schools.length){
+    $("view").innerHTML='<div class="card empty"><h2>Belum ada sekolah binaan</h2><p>Sekolah dan daftar kelas ditambahkan oleh admin di tab Kelola Sekolah.</p>'+(S.canAdmin?'<button class="btn primary" data-action="goto-sekolah">Tambah sekolah</button>':'')+'</div>';
+    return;
+  }
+  var opts='<option value="all">Semua sekolah binaan</option>'+schools.map(function(s){return '<option value="'+esc(s.id)+'"'+(S.scope===s.id?" selected":"")+'>'+esc(s.nama)+'</option>';}).join("");
+  var pc=(S.mode==="shared"&&isMgr())?pendingList().length+(S.canAdmin?pendingKS().length+pendingDN().length:0):0;
+  var head=(pc?'<div class="banner">Ada <b>'+pc+'</b> permintaan pendaftaran guru yang menunggu validasi. <button class="btn sm" data-action="goto-sekolah">Tinjau</button></div>':'')+'<div class="bar"><div class="field"><label for="f-month">Bulan laporan</label><input type="month" id="f-month" value="'+esc(S.month)+'"></div>'+
+    '<div class="field" style="min-width:220px"><label for="f-scope">Sekolah</label><select id="f-scope">'+opts+'</select></div><div class="spacer"></div>'+
+    '<button class="btn" data-action="csv-month">Unduh CSV bulan ini</button><button class="btn" data-action="csv-all">Unduh CSV semua bulan</button></div>';
+
+  var list=S.scope==="all"?schools:schools.filter(function(s){return s.id===S.scope;});
+  var tot={m:0,b:0,n:0,done:0,total:0};
+  list.forEach(function(s){var t=schoolStats(s,S.month);tot.m+=t.m;tot.b+=t.b;tot.n+=t.n;tot.done+=t.done;tot.total+=t.total;});
+  var kpis='<div class="kpis">'+
+    '<div class="kpi"><div class="l">Siswa beragama Islam</div><div class="v">'+fmt(tot.m)+'</div><div class="s">'+ymLabel(S.month)+'</div></div>'+
+    '<div class="kpi ok"><div class="l">Sudah bisa membaca Al-Qur\'an</div><div class="v">'+fmt(tot.b)+'</div><div class="s">'+pctTxt(pct(tot.b,tot.m))+' dari siswa Muslim</div></div>'+
+    '<div class="kpi warn"><div class="l">Belum bisa membaca Al-Qur\'an</div><div class="v">'+fmt(tot.n)+'</div><div class="s">'+pctTxt(pct(tot.n,tot.m))+' dari siswa Muslim</div></div>'+
+    '<div class="kpi"><div class="l">Kelas sudah lapor</div><div class="v">'+tot.done+'<span style="font-size:16px;color:var(--muted)"> / '+tot.total+'</span></div><div class="s">guru kelas bulan '+ymLabel(S.month)+'</div></div></div>';
+
+  var body="";
+  if(S.scope==="all"){
+    var rows="";
+    list.forEach(function(s){
+      var t=schoolStats(s,S.month);
+      rows+='<tr class="clk" data-action="pick-school" data-id="'+esc(s.id)+'"><td><b>'+esc(s.nama)+'</b><div class="hint">'+esc(s.jenjang)+'</div></td>'+
+        '<td>'+statusChip(t)+'</td><td class="n">'+(t.done?fmt(t.m):"–")+'</td><td class="n">'+(t.done?fmt(t.b):"–")+'</td><td class="n">'+(t.done?fmt(t.n):"–")+'</td><td>'+meter(t.b,t.m)+'</td></tr>';
+    });
+    body='<div class="card"><h2>Rekap per sekolah · '+ymLabel(S.month)+'</h2><div class="scroll"><table><thead><tr><th>Sekolah</th><th>Kelas lapor</th><th class="n">Siswa Muslim</th><th class="n">Bisa baca</th><th class="n">Belum bisa</th><th>% Bisa baca</th></tr></thead><tbody>'+rows+'</tbody>'+
+      '<tfoot><tr><td>Total</td><td>'+tot.done+'/'+tot.total+' kelas</td><td class="n">'+fmt(tot.m)+'</td><td class="n">'+fmt(tot.b)+'</td><td class="n">'+fmt(tot.n)+'</td><td>'+meter(tot.b,tot.m)+'</td></tr></tfoot></table></div>'+
+      '<div class="legend"><span><i style="background:var(--ok)"></i>Bisa membaca</span><span><i style="background:var(--bad-soft);border:1px solid var(--line)"></i>Belum bisa</span><span>Klik sekolah untuk melihat rincian per kelas.</span></div></div>';
+    var miss="";
+    list.forEach(function(s){
+      var ks=s.kelas.filter(function(k){return !crep(s.id,k.id,S.month);});
+      if(ks.length)miss+='<div class="miss"><b>'+esc(s.nama)+'</b> <span class="hint">('+ks.length+' kelas)</span><div class="cls">'+ks.map(function(k){return '<span class="chip bad">'+esc(k.nama)+(k.guruId?' · '+esc(guruTxt(k)):' · belum ada guru')+'</span>';}).join("")+'</div></div>';
+    });
+    body+='<div class="card"><h2>Kelas yang belum melapor · '+ymLabel(S.month)+'</h2>'+(miss||'<div class="empty">Semua kelas sudah melapor bulan ini.</div>')+'</div>';
+  }else{
+    var s=list[0],rows2="";
+    s.kelas.forEach(function(k){
+      var r=crep(s.id,k.id,S.month);
+      if(r){
+        var m=toInt(r.muslim),b=Math.min(toInt(r.bisa),m);
+        rows2+='<tr><td><b>'+esc(k.nama)+'</b></td><td>'+esc(reporterName(r))+'<div class="hint">'+tgl(r.updatedAt)+'</div></td><td class="n">'+fmt(m)+'</td><td class="n">'+fmt(b)+'</td><td class="n">'+fmt(m-b)+'</td><td>'+meter(b,m)+'</td></tr>';
+      }else{
+        rows2+='<tr><td><b>'+esc(k.nama)+'</b></td><td><span class="chip bad">Belum lapor</span><div class="hint">'+(k.guruId?esc(guruTxt(k)):'Belum ada guru kelas')+'</div></td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td>'+meter(0,0)+'</td></tr>';
+      }
+    });
+    var st=schoolStats(s,S.month);
+    body='<div class="card"><div class="bar" style="margin-bottom:6px"><h2 style="margin:0">'+esc(s.nama)+' · per kelas · '+ymLabel(S.month)+'</h2><div class="spacer"></div><button class="btn sm" data-action="back-all">← Semua sekolah</button></div>'+
+      '<div class="scroll"><table><thead><tr><th>Kelas</th><th>Guru pelapor</th><th class="n">Siswa Muslim</th><th class="n">Bisa baca</th><th class="n">Belum bisa</th><th>% Bisa baca</th></tr></thead><tbody>'+rows2+'</tbody>'+
+      '<tfoot><tr><td>Total</td><td>'+st.done+'/'+st.total+' kelas</td><td class="n">'+fmt(st.m)+'</td><td class="n">'+fmt(st.b)+'</td><td class="n">'+fmt(st.n)+'</td><td>'+meter(st.b,st.m)+'</td></tr></tfoot></table></div></div>';
+  }
+  $("view").innerHTML=head+kpis+body+trendCard(list);
+}
+function trendCard(list){
+  var months=[];for(var i=5;i>=0;i--)months.push(shiftYM(S.month,-i));
+  var pts=months.map(function(ym){
+    var m=0,b=0,any=false;
+    list.forEach(function(s){var t=schoolStats(s,ym);if(t.done){any=true;m+=t.m;b+=t.b;}});
+    return any?pct(b,m):null;
+  });
+  var W=640,H=210,L=40,R=16,T=16,B=32,iw=W-L-R,ih=H-T-B;
+  function x(i){return L+iw*i/(months.length-1);}
+  function y(v){return T+ih*(1-v/100);}
+  var g="";
+  [0,25,50,75,100].forEach(function(v){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+v+'%</text>';});
+  var path="",dots="",seg=[];
+  pts.forEach(function(v,i){
+    g+='<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle">'+BULAN[+months[i].split("-")[1]-1].slice(0,3)+' '+months[i].slice(2,4)+'</text>';
+    if(v==null){if(seg.length){path+=seg.join(" ")+" ";seg=[];}return;}
+    seg.push((seg.length?"L":"M")+x(i)+" "+y(v));
+    dots+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="4" fill="var(--ok)"/><text x="'+x(i)+'" y="'+(y(v)-9)+'" text-anchor="middle" style="fill:var(--ink);font-weight:700">'+pctTxt(v)+'</text>';
+  });
+  if(seg.length)path+=seg.join(" ");
+  var has=pts.some(function(v){return v!=null;});
+  return '<div class="card"><h2>Tren % siswa Muslim yang bisa membaca Al-Qur\'an (6 bulan terakhir)</h2>'+
+    (has?'<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Grafik tren persentase siswa bisa membaca Al-Qur\'an">'+g+'<path d="'+path+'" fill="none" stroke="var(--ok)" stroke-width="2.5"/>'+dots+'</svg>'
+      :'<div class="empty">Belum ada data laporan pada rentang bulan ini.</div>')+'</div>';
+}
+
+/* ---------- Lapor (guru kelas) ---------- */
+function renderDaftar(){
+  var h;
+  if(!sortedSchools().length)h='<div class="card empty form-narrow"><h2>Belum ada sekolah</h2><p>Admin perlu menambahkan sekolah dan daftar kelas terlebih dahulu.</p></div>';
+  else if(S.mode!=="shared")h='<div class="card form-narrow"><h2>Daftar sebagai guru kelas</h2><p class="hint" style="margin:0">Pendaftaran guru hanya berfungsi setelah Firebase dihubungkan, karena butuh akun yang bisa divalidasi admin. Di mode lokal tidak ada akun.</p></div>';
+  else if(!S.myId)h='<div class="card empty form-narrow"><h2>Akun Anda belum dikenali</h2><p>Masuk dengan akun Google Anda.</p></div>';
+  else h=regCard(true);
+  $("view").innerHTML=h;
+}
+
+/* ---------- Pendaftaran guru & validasi admin ---------- */
+function reqKey(sid,kid){return sid+"_"+kid;}
+function reqStatus(uid,r){
+  var sc=schoolById(r.sekolahId),k=sc&&sc.kelas.filter(function(x){return x.id===r.kelasId;})[0];
+  if(!sc)return "hilang";
+  if(r.lepas){
+    if(!k||k.guruId!==uid)return "selesai";
+    var d1=S.dec[uid],t1=d1&&d1.ditolak&&d1.ditolak["lepas_"+r.sekolahId+"_"+r.kelasId];
+    if(t1&&t1>=(r.ts||0))return "ditolak";
+    return "menunggu";
+  }
+  if(r.ubah){
+    var d3=S.dec[uid],rk=r.key||"",t3=d3&&d3.ditolak&&d3.ditolak[rk];
+    if(r.ubah==="nama"){if(d3&&d3.namaTs&&d3.namaTs>=(r.ts||0))return "selesai";}
+    else if(r.ubah==="kelas"){if(!k||k.guruId!==uid||k.nama===r.namaBaru)return "selesai";}
+    if(t3&&t3>=(r.ts||0))return "ditolak";
+    return "menunggu";
+  }
+  if(!k&&!r.baru)return "hilang";
+  if(k&&k.guruId===uid)return "disetujui";
+  if(k&&k.guruId)return "terisi";
+  var d=S.dec[uid],ts=d&&d.ditolak&&d.ditolak[reqKey(r.sekolahId,r.kelasId)];
+  if(ts&&ts>=(r.ts||0))return "ditolak";
+  return "menunggu";
+}
+function pendingList(){
+  var out=[];
+  Object.keys(S.regRaw).forEach(function(uid){
+    var rs=(S.regRaw[uid]&&S.regRaw[uid].requests)||{};
+    Object.keys(rs).forEach(function(key){
+      var r=rs[key];if(!r||!r.sekolahId)return;
+      if(manages(r.sekolahId)&&reqStatus(uid,r)==="menunggu")out.push({uid:uid,key:key,r:r});
+    });
+  });
+  out.sort(function(a,b){return (a.r.ts||0)-(b.r.ts||0);});
+  return out;
+}
+function regCard(force){
+  if(S.mode!=="shared"||(S.canAdmin&&!force)||!S.myId)return "";
+  var schools=sortedSchools();
+  if(!schools.length)return "";
+  var rg=S.reg;
+  if(!rg.school||!schoolById(rg.school))rg.school=schools[0].id;
+  var sc=schoolById(rg.school);
+  var open=sc.kelas.filter(function(k){return !k.guruId;});
+  var mineR=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  function isPend(k){var r=mineR[reqKey(sc.id,k.id)];return !!r&&reqStatus(S.myId,r)==="menunggu";}
+  Object.keys(rg.sel).forEach(function(id){if(!open.some(function(k){return k.id===id&&!isPend(k);}))delete rg.sel[id];});
+  var so=schools.map(function(x){return '<option value="'+esc(x.id)+'"'+(rg.school===x.id?" selected":"")+'>'+esc(x.nama)+'</option>';}).join("");
+  var ko=open.map(function(k){var pd=isPend(k);return '<label class="ck"><input type="checkbox" data-rk="'+esc(k.id)+'"'+((rg.sel[k.id]||pd)?" checked":"")+(pd?" disabled":"")+'> '+esc(k.nama)+(pd?' <span class="hint">(sudah diajukan)</span>':'')+'</label>';}).join("");
+  var mine=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  var rows=Object.keys(mine).map(function(key){
+    var r=mine[key],st=reqStatus(S.myId,r),sc2=schoolById(r.sekolahId);
+    if(!sc2)return "";
+    if(r.lepas){
+      if(st==="selesai")return "";
+      var lc={menunggu:'<span class="chip no">Menunggu persetujuan lepas kelas</span>',ditolak:'<span class="chip bad">Permintaan lepas ditolak</span>',hilang:'<span class="chip bad">Kelas tidak ditemukan</span>'}[st]||"";
+      return '<div class="pend"><div><b>'+esc(sc2.nama)+'</b> · '+esc(r.kelasNama||"")+'<div class="hint">Permintaan lepas kelas · '+tgl(r.ts)+'</div></div><div>'+lc+' <button class="btn sm" data-action="reg-cancel" data-key="'+esc(key)+'">'+(st==="menunggu"?"Batalkan":"Hapus")+'</button></div></div>';
+    }
+    if(r.ubah)return "";
+    var kn=r.kelasNama||"";
+    var chip={menunggu:'<span class="chip no">Menunggu validasi admin</span>',disetujui:'<span class="chip ok">Disetujui</span>',ditolak:'<span class="chip bad">Ditolak</span>',terisi:'<span class="chip bad">Kelas sudah punya guru lain</span>',hilang:'<span class="chip bad">Kelas tidak ditemukan</span>'}[st];
+    var act=(st==="menunggu"||st==="ditolak"||st==="terisi")?'<button class="btn sm" data-action="reg-cancel" data-key="'+esc(key)+'">'+(st==="menunggu"?"Batalkan":"Hapus")+'</button>':"";
+    return '<div class="pend"><div><b>'+esc(sc2.nama)+'</b> · '+esc(kn)+'<div class="hint">Diajukan '+tgl(r.ts)+'</div></div><div>'+chip+' '+act+'</div></div>';
+  }).join("");
+  var locked=nameLocked();
+  if(rg.nama===null||locked)rg.nama=typedName(S.myId)||S.myName||"";
+  var form='<div class="field" style="max-width:420px"><label for="r-nama">Nama lengkap guru'+(locked?" (untuk mengubah, pakai kartu Ubah data saya)":"")+'</label><input type="text" id="r-nama" value="'+esc(rg.nama)+'" placeholder="Tulis nama lengkap Anda" autocomplete="name"'+(locked?" disabled":"")+'></div>'+
+    '<div class="field" style="max-width:320px;margin-top:10px"><label for="r-school">Sekolah</label><select id="r-school">'+so+'</select></div>'+
+    (open.length?'<div class="field" style="margin-top:10px"><label>Pilih dari daftar kelas (boleh lebih dari satu)</label><div class="cks">'+ko+'</div></div>':'<div class="hint" style="margin-top:8px">Semua kelas di daftar sekolah ini sudah punya guru.</div>')+
+    '<div class="field" style="margin-top:10px"><label for="r-extra">Kelas belum ada di daftar? Ketik sendiri</label><input type="text" id="r-extra" value="'+esc(rg.extra)+'" placeholder="mis. Kelas 4B, Kelas 5A (pisahkan dengan koma)" autocomplete="off"><div class="hint">Kelas yang Anda ketik akan dibuat setelah admin menyetujui.</div></div>'+
+    '<div class="bar" style="margin:12px 0 0"><button class="btn primary" data-action="reg-submit"'+(S.canWrite?"":" disabled")+'>Ajukan pendaftaran</button></div>';
+  return '<div class="card form-narrow"><h2>Daftar sebagai guru kelas</h2>'+
+    '<div class="hint" style="margin-bottom:8px">Pilih sekolah, lalu centang kelas yang Anda ajar atau ketik nama kelasnya sendiri. Setelah admin menyetujui, kelas itu muncul di halaman laporan Anda.</div>'+
+    form+(rows?'<h2 style="margin-top:16px">Status pendaftaran Anda</h2>'+rows:'')+'</div>';
+}
+function clean(v){return String(v==null?"":v).trim().replace(/\s+/g," ");}
+function nameLocked(){return S.mode==="shared"&&!S.canAdmin&&!!S.myId&&allowed().some(function(x){return x.k.guruId===S.myId;});}
+function myReq(key){return ((S.regRaw[S.myId]||{}).requests||{})[key]||null;}
+function ubahSt(key){var r=myReq(key);return r?reqStatus(S.myId,r):"";}
+function ubahChip(key){
+  var st=ubahSt(key);
+  if(st==="menunggu")return '<span class="chip no">Menunggu persetujuan</span> <button class="btn sm" data-action="reg-cancel" data-key="'+esc(key)+'">Batalkan</button>';
+  if(st==="ditolak")return '<span class="chip bad">Ditolak</span> <button class="btn sm" data-action="reg-cancel" data-key="'+esc(key)+'">Hapus</button>';
+  return "";
+}
+function ubahTxt(r){
+  if(r.ubah==="nama")return 'ubah nama guru menjadi <b>'+esc(r.namaBaru)+'</b>';
+  if(r.ubah==="kelas")return 'ubah nama kelas <b>'+esc(r.kelasNama||"")+'</b> menjadi <b>'+esc(r.namaBaru)+'</b>';
+  return 'ubah data';
+}
+function profileCard(){
+  if(S.mode!=="shared"||S.canAdmin||!S.myId)return "";
+  var pf=S.prof,cur=typedName(S.myId)||S.myName||"";
+  var mine=allowed().filter(function(x){return x.k.guruId===S.myId;});
+  if(!mine.length)return "";
+  var schools=[],seen={};mine.forEach(function(x){if(!seen[x.s.id]){seen[x.s.id]=1;schools.push(x.s);}});
+  function dis(key){return (S.canWrite&&ubahSt(key)!=="menunggu")?"":" disabled";}
+  var nk="ubah_nama";
+  var h='<div class="card form-narrow"><h2>Ubah data saya</h2><div class="hint">Perubahan nama guru dan nama kelas harus diajukan dan disetujui admin atau kepala sekolah. Selama belum disetujui, data lama tetap dipakai. Nama sekolah tidak bisa diedit, hanya dipilih dari daftar yang dibuat admin.</div>'+
+    '<div class="field" style="max-width:420px;margin-top:10px"><label for="p-nama">Nama lengkap guru</label><input type="text" id="p-nama" value="'+esc(pf.nd?pf.nama:cur)+'" autocomplete="name"></div>'+
+    '<div class="bar" style="margin:8px 0 0"><button class="btn primary" data-action="ubah-nama"'+dis(nk)+'>Ajukan perubahan nama</button>'+ubahChip(nk)+'</div>';
+  schools.forEach(function(sc){
+    h+='<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)">'+
+      '<div class="who" style="margin-top:0"><div><div class="hint">Sekolah</div><b>'+esc(sc.nama)+'</b></div></div>';
+    mine.filter(function(x){return x.s.id===sc.id;}).forEach(function(x){
+      var kk="ubahkelas_"+sc.id+"_"+x.k.id,lk="lepas_"+sc.id+"_"+x.k.id,pk=sc.id+"_"+x.k.id;
+      var lp=ubahSt(lk)==="menunggu";
+      h+='<div class="as-row"><div class="as-ctl" style="max-width:420px"><label class="hint">Nama kelas</label><input type="text" class="p-k" data-sid="'+esc(sc.id)+'" data-kid="'+esc(x.k.id)+'" value="'+esc(pf.k[pk]!=null?pf.k[pk]:x.k.nama)+'">'+
+        '<div><button class="btn sm primary" data-action="ubah-kelas" data-sid="'+esc(sc.id)+'" data-kid="'+esc(x.k.id)+'"'+dis(kk)+'>Ajukan perubahan nama kelas</button> '+ubahChip(kk)+'</div></div>'+
+        '<div>'+(lp?'<span class="chip no">Menunggu persetujuan lepas kelas</span>':'<button class="btn sm danger" data-action="lepas" data-sid="'+esc(sc.id)+'" data-kid="'+esc(x.k.id)+'"'+(S.canWrite?"":" disabled")+'>Ajukan lepas kelas</button>')+'</div></div>';
+    });
+    h+='</div>';
+  });
+  h+='<div class="hint" style="margin-top:10px">Pindah sekolah atau ganti kelas: ajukan lepas kelas lama, lalu pilih sekolah dari daftar dan daftarkan kelas baru di kartu di bawah. Keduanya perlu persetujuan. Jumlah siswa tetap bisa diperbarui lewat form laporan di atas.</div></div>';
+  return h+regCard(true);
+}
+function submitUbah(jenis,sid,kid){
+  var pf=S.prof,sc=schoolById(sid),key,r,val,ts=Date.now();
+  if(jenis==="nama"){
+    var cur=typedName(S.myId)||S.myName||"";
+    val=clean(pf.nd?pf.nama:cur);
+    if(val.length<3){toast("Tulis nama lengkap minimal 3 huruf");return;}
+    if(val===cur){toast("Nama tidak berubah");return;}
+    var m0=allowed().filter(function(x){return x.k.guruId===S.myId;})[0];if(!m0)return;
+    key="ubah_nama";r={ubah:"nama",key:key,sekolahId:m0.s.id,kelasNama:"",namaBaru:val,ts:ts};
+  }else if(jenis==="kelas"){
+    var k=sc&&sc.kelas.filter(function(x){return x.id===kid;})[0];if(!k||k.guruId!==S.myId)return;
+    val=clean(pf.k[sid+"_"+kid]);
+    if(!val){toast("Tulis nama kelas baru");return;}
+    if(val===k.nama){toast("Nama kelas tidak berubah");return;}
+    if(sc.kelas.some(function(x){return x.id!==k.id&&x.nama.toLowerCase()===val.toLowerCase();})){toast("Nama kelas itu sudah dipakai di sekolah ini");return;}
+    key="ubahkelas_"+sid+"_"+kid;r={ubah:"kelas",key:key,sekolahId:sid,kelasId:kid,kelasNama:k.nama,namaBaru:val,ts:ts};
+  }else return;
+  var curR=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  var next=JSON.parse(JSON.stringify(curR));next[key]=r;
+  repo.set(COL_P,S.myId,regDoc(next,(S.regRaw[S.myId]||{}).nama||S.myName||"")).then(function(){
+    if(jenis==="nama"){pf.nd=false;pf.nama=null;}else delete pf.k[sid+"_"+kid];
+    toast("Perubahan diajukan. Menunggu persetujuan.");render();
+  }).catch(writeFail);
+}
+function requestRelease(sid,kid){
+  var sc=schoolById(sid),k=sc&&sc.kelas.filter(function(x){return x.id===kid;})[0];
+  if(!k||k.guruId!==S.myId)return;
+  if(!confirm("Ajukan melepas "+k.nama+" di "+sc.nama+"? Admin atau kepala sekolah perlu menyetujui."))return;
+  var cur=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  var next=JSON.parse(JSON.stringify(cur));
+  delete next[reqKey(sid,kid)];
+  next["lepas_"+sid+"_"+kid]={sekolahId:sid,kelasId:kid,kelasNama:k.nama,lepas:true,ts:Date.now()};
+  repo.set(COL_P,S.myId,regDoc(next,typedName(S.myId)||S.myName)).then(function(){toast("Permintaan lepas kelas dikirim");render();}).catch(writeFail);
+}
+function submitReg(){
+  var rg=S.reg,sc=schoolById(rg.school);
+  var nama=String(rg.nama||"").trim().replace(/\s+/g," ");
+  if(nameLocked())nama=typedName(S.myId);
+  if(nama.length<3){toast("Tulis nama lengkap Anda");return;}
+  if(!sc){toast("Pilih sekolah");return;}
+  var cur=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  var next=JSON.parse(JSON.stringify(cur)),ts=Date.now(),n=0,skipped=[],seen={};
+  sc.kelas.forEach(function(k){if(rg.sel[k.id]&&!k.guruId){next[reqKey(sc.id,k.id)]={sekolahId:sc.id,kelasId:k.id,kelasNama:k.nama,ts:ts};seen[k.id]=1;n++;}});
+  String(rg.extra||"").split(/[,\n;]+/).forEach(function(raw){
+    var nm=raw.trim().replace(/\s+/g," ");if(!nm)return;
+    var ex=sc.kelas.filter(function(k){return k.nama.toLowerCase()===nm.toLowerCase();})[0];
+    if(ex){
+      if(ex.guruId){skipped.push(ex.nama);return;}
+      if(!seen[ex.id]){next[reqKey(sc.id,ex.id)]={sekolahId:sc.id,kelasId:ex.id,kelasNama:ex.nama,ts:ts};seen[ex.id]=1;n++;}
+      return;
+    }
+    var id=slug(nm),base=id,i=2;
+    while(sc.kelas.some(function(k){return k.id===id;})||seen[id]){id=base+"-"+i;i++;}
+    seen[id]=1;
+    next[reqKey(sc.id,id)]={sekolahId:sc.id,kelasId:id,kelasNama:nm,baru:true,ts:ts};n++;
+  });
+  if(!n){toast(skipped.length?skipped.join(", ")+" sudah punya guru":"Pilih atau ketik minimal satu kelas");return;}
+  repo.set(COL_P,S.myId,regDoc(next,nama)).then(function(){rg.sel={};rg.extra="";toast(n+" kelas diajukan. Menunggu validasi admin."+(skipped.length?" Dilewati (sudah ada guru): "+skipped.join(", "):""));render();}).catch(writeFail);
+}
+function cancelReg(key){
+  var cur=(S.regRaw[S.myId]&&S.regRaw[S.myId].requests)||{};
+  var next=JSON.parse(JSON.stringify(cur));delete next[key];
+  repo.set(COL_P,S.myId,regDoc(next,typedName(S.myId))).then(function(){toast("Dihapus");render();}).catch(writeFail);
+}
+function approveReg(uid,key){
+  var rs=(S.regRaw[uid]&&S.regRaw[uid].requests)||{},r=rs[key];if(!r)return;
+  var sc=schoolById(r.sekolahId);if(!sc)return;
+  if(r.lepas){
+    var kl0=sc.kelas.map(function(k){return (k.id===r.kelasId&&k.guruId===uid)?{id:k.id,nama:k.nama,guruId:null}:k;});
+    saveKelasList(sc,kl0).then(function(){toast("Kelas "+r.kelasNama+" dilepas dari guru");}).catch(writeFail);
+    return;
+  }
+  if(r.ubah){
+    if(reqStatus(uid,r)!=="menunggu"){toast("Permintaan ini sudah tidak berlaku");return;}
+    var nb=r.namaBaru;
+    if(r.ubah==="nama"){
+      repo.set(COL_D,uid,Object.assign(strip(S.dec[uid]),{nama:nb,namaTs:r.ts})).then(function(){toast("Perubahan nama guru disetujui");}).catch(writeFail);
+    }else if(r.ubah==="kelas"){
+      var kc=sc.kelas.filter(function(k){return k.id===r.kelasId;})[0];
+      if(!kc||kc.guruId!==uid){toast("Kelas ini bukan lagi kelas guru tersebut");return;}
+      if(sc.kelas.some(function(k){return k.id!==kc.id&&k.nama.toLowerCase()===nb.toLowerCase();})){toast("Nama kelas itu sudah dipakai di sekolah ini");return;}
+      var kl2=sc.kelas.map(function(k){return k.id===kc.id?{id:k.id,nama:nb,guruId:k.guruId}:k;});
+      saveKelasList(sc,kl2).then(function(){toast("Perubahan nama kelas disetujui");}).catch(writeFail);
+    }
+    return;
+  }
+  var ex=sc.kelas.filter(function(k){return k.id===r.kelasId;})[0],kl;
+  if(ex){
+    if(ex.guruId){toast("Kelas ini sudah punya guru");return;}
+    kl=sc.kelas.map(function(k){return k.id===r.kelasId?{id:k.id,nama:k.nama,guruId:uid}:k;});
+  }else if(r.baru){
+    kl=sc.kelas.concat([{id:r.kelasId,nama:r.kelasNama,guruId:uid}]);
+  }else return;
+  saveKelasList(sc,kl).then(function(){toast("Guru disetujui untuk "+r.kelasNama);}).catch(writeFail);
+}
+function rejectReg(uid,key){
+  var d=(S.dec[uid]&&S.dec[uid].ditolak)||{};
+  var next=JSON.parse(JSON.stringify(d));next[key]=Date.now();
+  repo.set(COL_D,uid,Object.assign(strip(S.dec[uid]),{ditolak:next})).then(function(){toast("Pendaftaran ditolak");}).catch(writeFail);
+}
+function ksStatus(uid,req){
+  var sc=schoolById(req.sekolahId);if(!sc)return "hilang";
+  if(sc.kepsekId===uid)return "disetujui";
+  if(sc.kepsekId)return "terisi";
+  var d=S.dec[uid];if(d&&d.kepsekDitolak&&d.kepsekDitolak>=(req.ts||0))return "ditolak";
+  return "menunggu";
+}
+function pendingKS(){
+  var out=[];
+  Object.keys(S.regRaw).forEach(function(uid){var q=S.regRaw[uid]&&S.regRaw[uid].kepsek;if(q&&q.sekolahId&&ksStatus(uid,q)==="menunggu")out.push({uid:uid,r:q});});
+  return out;
+}
+function pendingKSCard(){
+  if(S.mode!=="shared"||!S.canAdmin)return "";
+  var l=pendingKS();if(!l.length)return "";
+  return '<div class="card"><h2>Permintaan Kepala Sekolah ('+l.length+')</h2>'+l.map(function(p){var sc=schoolById(p.r.sekolahId);
+    return '<div class="pend"><div><b>'+esc(nameOf(p.uid))+'</b><div class="hint">Kepala sekolah '+esc(sc.nama)+' · diajukan '+tgl(p.r.ts)+'</div></div><div><button class="btn sm primary" data-action="ks-approve" data-uid="'+esc(p.uid)+'" data-sid="'+esc(p.r.sekolahId)+'">Setujui</button> <button class="btn sm danger" data-action="ks-reject" data-uid="'+esc(p.uid)+'">Tolak</button></div></div>';}).join("")+'</div>';
+}
+function ksCard(){
+  if(S.mode!=="shared"||S.canAdmin||!S.myId)return "";
+  var schools=sortedSchools();if(!schools.length)return "";
+  var mine=managed(),req=(S.regRaw[S.myId]||{}).kepsek,st=req?ksStatus(S.myId,req):"",info="";
+  if(mine.length)info='<div class="pend"><div><b>'+esc(mine.map(function(x){return x.nama;}).join(", "))+'</b></div><span class="chip ok">Anda kepala sekolah</span></div>';
+  else if(req&&st!=="hilang"){
+    var sc=schoolById(req.sekolahId);
+    var chip={menunggu:'<span class="chip no">Menunggu validasi admin</span>',ditolak:'<span class="chip bad">Ditolak</span>',terisi:'<span class="chip bad">Sekolah sudah punya kepala sekolah</span>'}[st]||"";
+    info='<div class="pend"><div><b>'+esc(sc.nama)+'</b><div class="hint">Diajukan '+tgl(req.ts)+'</div></div><div>'+chip+' <button class="btn sm" data-action="ks-cancel">'+(st==="menunggu"?"Batalkan":"Hapus")+'</button></div></div>';
+  }
+  var form=(mine.length||st==="menunggu")?"":'<div class="field" style="max-width:320px"><label for="k-school">Sekolah yang Anda pimpin</label><select id="k-school">'+schools.map(function(x){return '<option value="'+esc(x.id)+'">'+esc(x.nama)+'</option>';}).join("")+'</select></div><div class="bar" style="margin:12px 0 0"><button class="btn primary" data-action="ks-submit"'+(S.canWrite?"":" disabled")+'>Ajukan sebagai Kepala Sekolah</button></div>';
+  return '<div class="card form-narrow"><h2>Daftar sebagai Kepala Sekolah</h2><div class="hint" style="margin-bottom:8px">Pilih sekolah Anda. Setelah admin menyetujui, Anda bisa menyetujui guru yang mendaftar dan memantau laporan guru tiap bulan.</div>'+info+form+'</div>';
+}
+function renderKepsekDaftar(){
+  var h,c='<div class="card form-narrow"><h2>Daftar sebagai Kepala Sekolah</h2><p class="hint" style="margin:0">';
+  if(S.mode!=="shared")h=c+'Fitur ini butuh Firebase dan akun Google.</p></div>';
+  else if(S.canAdmin)h=c+'Anda masuk sebagai admin, jadi tidak perlu mendaftar. Bagikan alamat situs ke kepala sekolah. Permintaan mereka muncul di tab Kelola Sekolah untuk Anda setujui.</p></div>';
+  else if(!S.myId)h=c+'Akun Anda belum dikenali. Masuk dengan akun Google Anda.</p></div>';
+  else if(!sortedSchools().length)h=c+'Admin perlu menambahkan sekolah terlebih dahulu.</p></div>';
+  else h=ksCard();
+  $("view").innerHTML=h;
+}
+function dnStatus(uid,req){
+  var d=S.dinasRaw[uid];
+  if(d&&d.aktif===true)return "disetujui";
+  if(d&&d.ditolak&&d.ditolak>=(req.ts||0))return "ditolak";
+  return "menunggu";
+}
+function pendingDN(){
+  var out=[];
+  Object.keys(S.regRaw).forEach(function(u){var q=S.regRaw[u]&&S.regRaw[u].dinas;if(q&&dnStatus(u,q)==="menunggu")out.push({uid:u,r:q});});
+  return out;
+}
+function pendingDNCard(){
+  if(S.mode!=="shared"||!S.canAdmin)return "";
+  var l=pendingDN();if(!l.length)return "";
+  return '<div class="card"><h2>Permintaan akses Dinas ('+l.length+')</h2>'+l.map(function(p){
+    return '<div class="pend"><div><b>'+esc(nameOf(p.uid))+'</b><div class="hint">'+esc(p.r.instansi||"")+' · diajukan '+tgl(p.r.ts)+'</div></div><div><button class="btn sm primary" data-action="dn-approve" data-uid="'+esc(p.uid)+'">Setujui</button> <button class="btn sm danger" data-action="dn-reject" data-uid="'+esc(p.uid)+'">Tolak</button></div></div>';
+  }).join("")+'</div>';
+}
+function renderDinas(){
+  var c='<div class="card form-narrow"><h2>Dinas (hanya lihat)</h2>',h;
+  if(S.mode!=="shared")h=c+'<p class="hint" style="margin:0">Fitur ini butuh Firebase dan akun Google.</p></div>';
+  else if(S.canAdmin){
+    var rows=Object.keys(S.dinasRaw).filter(function(u){return S.dinasRaw[u].aktif===true;}).map(function(u){var d=S.dinasRaw[u];
+      return '<div class="pend"><div><b>'+esc(nameOf(u))+'</b><div class="hint">'+esc(d.instansi||"")+'</div></div><div><button class="btn sm danger" data-action="dn-revoke" data-uid="'+esc(u)+'">Cabut akses</button></div></div>';}).join("");
+    h=c+'<p class="hint" style="margin-top:0">Akun Dinas hanya bisa melihat Dashboard semua sekolah dan mengunduh CSV, tanpa bisa mengubah data. Bagikan alamat situs ke pihak Dinas. Permintaan mereka muncul di tab Kelola Sekolah untuk Anda setujui.</p><h2 style="margin-top:12px">Akun Dinas aktif</h2>'+(rows||'<div class="hint">Belum ada akun Dinas.</div>')+'</div>';
+  }
+  else if(!S.myId)h=c+'<p class="hint" style="margin:0">Akun Anda belum dikenali. Masuk dengan akun Google Anda.</p></div>';
+  else if(isDinas()){
+    var me=S.dinasRaw[S.myId];
+    h=c+'<div class="pend"><div><b>'+esc(nameOf(S.myId))+'</b><div class="hint">'+esc(me.instansi||"")+'</div></div><span class="chip ok">Akses Dinas aktif</span></div><p class="hint" style="margin-bottom:0">Anda bisa melihat Dashboard semua sekolah dan mengunduh CSV. Data tidak bisa diubah dari akun ini.</p></div>';
+  }else{
+    var q=(S.regRaw[S.myId]||{}).dinas,st=q?dnStatus(S.myId,q):"";
+    if(S.dn.nama===null)S.dn.nama=typedName(S.myId)||S.myName||"";
+    var info=q?'<div class="pend"><div><b>'+esc(q.instansi||"")+'</b><div class="hint">Diajukan '+tgl(q.ts)+'</div></div><div>'+(st==="menunggu"?'<span class="chip no">Menunggu validasi admin</span>':'<span class="chip bad">Ditolak</span>')+' <button class="btn sm" data-action="dn-cancel">'+(st==="menunggu"?"Batalkan":"Hapus")+'</button></div></div>':"";
+    var form=st==="menunggu"?"":'<div class="field" style="max-width:420px"><label for="dn-nama">Nama lengkap</label><input type="text" id="dn-nama" value="'+esc(S.dn.nama)+'" autocomplete="name"></div><div class="field" style="max-width:420px;margin-top:10px"><label for="dn-inst">Instansi dan jabatan</label><input type="text" id="dn-inst" value="'+esc(S.dn.inst)+'" placeholder="mis. Dinas Pendidikan, Kepala Bidang" autocomplete="off"></div><div class="bar" style="margin:12px 0 0"><button class="btn primary" data-action="dn-submit">Ajukan akses Dinas</button></div>';
+    h=c+'<div class="hint" style="margin-bottom:8px">Untuk pihak Dinas yang hanya perlu memantau laporan. Setelah admin menyetujui, Anda bisa melihat Dashboard semua sekolah tanpa bisa mengubah data.</div>'+info+form+'</div>';
+  }
+  $("view").innerHTML=h;
+}
+function dnSubmit(){
+  var nama=String(S.dn.nama||"").trim().replace(/\s+/g," "),inst=String(S.dn.inst||"").trim().replace(/\s+/g," ");
+  if(nama.length<3){toast("Tulis nama lengkap Anda");return;}
+  if(inst.length<3){toast("Tulis instansi dan jabatan Anda");return;}
+  var cur=S.regRaw[S.myId]||{},d=regDoc(cur.requests||{},nama);d.dinas={instansi:inst,ts:Date.now()};
+  repo.set(COL_P,S.myId,d).then(function(){S.dn.inst="";toast("Pengajuan dikirim. Menunggu validasi admin.");render();}).catch(writeFail);
+}
+function dnCancel(){
+  var cur=S.regRaw[S.myId]||{},d=regDoc(cur.requests||{},cur.nama||S.myName||"");delete d.dinas;
+  repo.set(COL_P,S.myId,d).then(function(){toast("Dihapus");render();}).catch(writeFail);
+}
+function dnApprove(u){
+  var q=S.regRaw[u]&&S.regRaw[u].dinas;if(!q)return;
+  repo.set(COL_N,u,{aktif:true,instansi:q.instansi||"",ts:Date.now()}).then(function(){toast("Akses Dinas disetujui");}).catch(writeFail);
+}
+function dnDeny(u,msg){repo.set(COL_N,u,{ditolak:Date.now()}).then(function(){toast(msg);}).catch(writeFail);}
+function renderKepsek(){
+  var h=pendingCard();
+  managed().forEach(function(s){
+    var rows=s.kelas.map(function(k){var r=crep(s.id,k.id,S.month);
+      return '<div class="pend"><div><b>'+esc(k.nama)+'</b><div class="hint">'+(k.guruId?esc(guruTxt(k)):'Belum ada guru')+'</div></div><div>'+(k.guruId?(r?'<span class="chip ok">Sudah lapor</span>':'<span class="chip bad">Belum lapor</span>')+' <button class="btn sm danger" data-action="unassign" data-sid="'+esc(s.id)+'" data-kid="'+esc(k.id)+'">Lepas guru</button>':'')+'</div></div>';}).join("");
+    h+='<div class="card"><h2>'+esc(s.nama)+' · guru kelas ('+ymLabel(S.month)+')</h2>'+(rows||'<div class="empty">Belum ada kelas.</div>')+'<div class="hint" style="margin-top:8px">Rincian angka per bulan ada di tab Dashboard.</div></div>';
+  });
+  $("view").innerHTML=h;
+}
+function jsonCard(){return '<div class="card"><h2>Cadangan data (JSON)</h2><div class="hint" style="margin-bottom:8px">Unduh cadangan sekolah, kelas, guru, dan semua laporan. Memulihkan akan menimpa data yang ID-nya sama.</div><div class="bar" style="margin:0"><button class="btn" data-action="json-export">Unduh cadangan JSON</button><button class="btn" data-action="json-import">Pulihkan dari file JSON</button><input type="file" id="j-file" accept=".json,application/json" style="display:none"></div></div>';}
+function exportJSON(){
+  var o={versi:1,dibuat:new Date().toISOString(),sekolah:S.schools.map(function(x){var d={id:x.id,nama:x.nama,jenjang:x.jenjang,kelas:x.kelas.map(function(k){var y={id:k.id,nama:k.nama};if(k.guruId)y.guruId=k.guruId;return y;})};if(x.kepsekId)d.kepsekId=x.kepsekId;return d;}),laporan:Object.keys(S.raw).map(function(id){return {id:id,reports:(S.raw[id]&&S.raw[id].reports)||{}};})};
+  var b=new Blob([JSON.stringify(o,null,2)],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="cadangan-laporan-quran-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},300);toast("Cadangan diunduh");
+}
+function importJSON(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var o;try{o=JSON.parse(rd.result);}catch(e){toast("File bukan JSON yang valid");return;}
+    if(!o||!Array.isArray(o.sekolah)||!Array.isArray(o.laporan)){toast("Format cadangan tidak dikenali");return;}
+    if(!confirm("Pulihkan "+o.sekolah.length+" sekolah dan laporan dari "+o.laporan.length+" guru? Data dengan ID sama akan ditimpa."))return;
+    var ps=[];
+    o.sekolah.forEach(function(x){if(!x||!x.id)return;var d={nama:x.nama||"",jenjang:x.jenjang||"",kelas:x.kelas||[]};if(x.kepsekId)d.kepsekId=x.kepsekId;ps.push(repo.set(COL_S,String(x.id),d));});
+    o.laporan.forEach(function(l){if(l&&l.id)ps.push(repo.set(COL_R,String(l.id),{reports:l.reports||{}}));});
+    Promise.all(ps).then(function(){toast("Data dipulihkan");}).catch(writeFail);
+  };
+  rd.readAsText(f);inp.value="";
+}
+function pendingCard(){
+  var list=pendingList();
+  return pendingKSCard()+pendingDNCard()+'<div class="card"><h2>Permintaan pendaftaran guru ('+list.length+')</h2>'+
+    (list.length?list.map(function(p){
+      var sc=schoolById(p.r.sekolahId);
+      return '<div class="pend"><div><b>'+esc(nameOf(p.uid))+'</b><div class="hint">'+esc(sc?sc.nama:"")+' · '+(p.r.ubah?ubahTxt(p.r):esc(p.r.kelasNama||""))+(p.r.lepas?' <span class="chip bad">minta melepas kelas</span>':'')+(p.r.baru&&sc&&!sc.kelas.some(function(k){return k.id===p.r.kelasId;})?' <span class="chip no">kelas baru</span>':'')+' · diajukan '+tgl(p.r.ts)+'</div></div>'+
+        '<div><button class="btn sm primary" data-action="approve" data-uid="'+esc(p.uid)+'" data-key="'+esc(p.key)+'">Setujui</button> <button class="btn sm danger" data-action="reject" data-uid="'+esc(p.uid)+'" data-key="'+esc(p.key)+'">Tolak</button></div></div>';
+    }).join(""):'<div class="hint">Tidak ada permintaan yang menunggu. Guru mendaftar sendiri lewat tab Lapor.</div>')+'</div>';
+}
+
+function loadG(al,force){
+  var g=S.g;
+  var ok=al.some(function(x){return x.s.id===g.school&&x.k.id===g.kelas;});
+  if(!ok){g.school=al.length?al[0].s.id:"";g.kelas=al.length?al[0].k.id:"";g.loadedKey="";}
+  var key=g.school+"_"+g.kelas+"_"+g.month;
+  if(!force&&g.loadedKey===key)return;
+  var r=crep(g.school,g.kelas,g.month);
+  g.prefilled=false;
+  if(r){g.muslim=String(toInt(r.muslim));g.bisa=String(toInt(r.bisa));if(S.mode==="local"&&!g.pelapor&&r.pelapor)g.pelapor=r.pelapor;}
+  else{
+    var p=crep(g.school,g.kelas,shiftYM(g.month,-1));
+    g.muslim=p?String(toInt(p.muslim)):"";g.bisa="";g.prefilled=!!p;
+  }
+  g.dirty=false;g.loadedKey=key;
+}
+function renderInput(){
+  var g=S.g,al=allowed();
+  if(!sortedSchools().length){
+    $("view").innerHTML='<div class="card empty"><h2>Belum ada sekolah</h2><p>Admin perlu menambahkan sekolah dan daftar kelas terlebih dahulu.</p>'+(S.canAdmin?'<button class="btn primary" data-action="goto-sekolah">Kelola sekolah</button>':'')+'</div>';
+    return;
+  }
+  if(!al.length){
+    $("view").innerHTML=(S.myId?'<div class="card form-narrow"><h2>Anda belum terdaftar sebagai guru kelas</h2><p class="hint" style="margin:0">Daftarkan kelas yang Anda ajar di bawah ini. Admin akan memvalidasi, lalu kelas Anda muncul di halaman ini.</p></div>'+regCard():'<div class="card empty form-narrow"><h2>Akun Anda belum dikenali</h2><p>Masuk dengan akun Google Anda.</p></div>');
+    return;
+  }
+  loadG(al,false);
+  var cur=null;al.forEach(function(x){if(x.s.id===g.school&&x.k.id===g.kelas)cur=x;});
+  var s=cur.s,k=cur.k;
+  var dis=S.canWrite?"":" disabled";
+  var schoolsAllowed=[],seen={};al.forEach(function(x){if(!seen[x.s.id]){seen[x.s.id]=1;schoolsAllowed.push(x.s);}});
+  var kelasAllowed=al.filter(function(x){return x.s.id===g.school;});
+  var pick;
+  if(al.length===1){
+    pick='<div class="who"><div><b>'+esc(s.nama)+'</b><div class="hint">'+esc(k.nama)+'</div></div></div>';
+  }else{
+    var so=schoolsAllowed.map(function(x){return '<option value="'+esc(x.id)+'"'+(g.school===x.id?" selected":"")+'>'+esc(x.nama)+'</option>';}).join("");
+    var ko=kelasAllowed.map(function(x){return '<option value="'+esc(x.k.id)+'"'+(g.kelas===x.k.id?" selected":"")+'>'+esc(x.k.nama)+'</option>';}).join("");
+    pick='<div class="grid2"><div class="field"><label for="g-school">Sekolah</label><select id="g-school">'+so+'</select></div><div class="field"><label for="g-kelas">Kelas</label><select id="g-kelas">'+ko+'</select></div></div>';
+  }
+  var existed=!!crep(g.school,g.kelas,g.month);
+  var by="";
+  if(S.mode==="shared"){
+    var onBehalf=S.canAdmin&&k.guruId&&k.guruId!==S.myId;
+    by='<div class="hint" style="margin-top:10px">Pelapor: <b>'+esc(onBehalf?nameOf(k.guruId):(typedName(S.myId)||S.myName||"Anda"))+'</b>'+(onBehalf?' (Anda mengisi atas nama guru kelas ini)':'')+'</div>';
+  }else{
+    by='<div class="field" style="margin-top:10px"><label for="g-pelapor">Nama guru kelas</label><input type="text" id="g-pelapor" value="'+esc(g.pelapor)+'" placeholder="Nama lengkap Anda"'+dis+'></div>';
+  }
+  var chips=kelasAllowed.map(function(x){
+    var d=!!crep(g.school,x.k.id,g.month);
+    return '<button class="'+(d?"done ":"")+(x.k.id===g.kelas?"cur":"")+'" data-action="pick-class" data-id="'+esc(x.k.id)+'">'+(d?"✓ ":"")+esc(x.k.nama)+'</button>';
+  }).join("");
+  var chipCard=kelasAllowed.length>1?'<div class="card form-narrow"><h2>Kelas Anda di '+esc(s.nama)+'</h2><div class="cls">'+chips+'</div></div>':'';
+  $("view").innerHTML='<div class="card form-narrow"><h2>Laporan kelas · '+ymLabel(g.month)+'</h2>'+pick+
+    '<div class="field" style="margin-top:10px"><label for="g-month">Bulan laporan</label><input type="month" id="g-month" value="'+esc(g.month)+'"></div>'+by+
+    '<div class="grid2 bigin" style="margin-top:12px"><div class="field"><label for="g-muslim">Jumlah siswa beragama Islam</label><input type="number" inputmode="numeric" min="0" id="g-muslim" value="'+esc(g.muslim)+'"'+dis+'></div>'+
+    '<div class="field"><label for="g-bisa">Yang sudah bisa membaca Al-Qur\'an</label><input type="number" inputmode="numeric" min="0" id="g-bisa" value="'+esc(g.bisa)+'"'+dis+'></div></div>'+
+    (g.prefilled?'<div class="hint" style="margin-top:6px">Jumlah siswa Muslim diisi dari laporan bulan lalu. Ubah jika ada perubahan.</div>':'')+
+    '<div class="calc"><div><small>Belum bisa membaca (otomatis)</small><b id="g-belum">–</b></div><div><small>Persentase bisa membaca</small><b id="g-pct">–</b></div></div>'+
+    '<div class="bar" style="margin-bottom:0"><button class="btn primary" data-action="save-report"'+dis+'>'+(existed?"Perbarui laporan":"Kirim laporan")+'</button>'+
+    (existed?'<button class="btn danger" data-action="del-report"'+dis+'>Hapus</button>':'')+'<span class="hint" id="g-msg"></span></div>'+
+    (existed?'<div class="hint" style="margin-top:8px">Kelas ini sudah dilaporkan bulan ini. Mengirim lagi akan memperbarui data sebelumnya.</div>':'')+
+    '</div>'+chipCard+profileCard();
+  updG();
+}
+function updG(){
+  var g=S.g,m=toInt(g.muslim),b=toInt(g.bisa),bad=b>m;
+  var bl=$("g-belum");if(!bl)return;
+  bl.textContent=g.muslim===""?"–":(bad?"!":fmt(m-b));
+  $("g-pct").textContent=(g.muslim===""||bad)?"–":pctTxt(pct(b,m));
+  $("g-bisa").classList.toggle("err",bad);
+}
+function targetDoc(k){
+  if(S.mode==="local")return "lokal";
+  if(S.canAdmin&&k.guruId&&k.guruId!==S.myId)return k.guruId;
+  return S.myId;
+}
+function writeMyReports(docId,mutate){
+  var cur=(S.raw[docId]&&S.raw[docId].reports)||{};
+  var next=JSON.parse(JSON.stringify(cur));
+  mutate(next);
+  return repo.set(COL_R,docId,{reports:next});
+}
+function saveReport(){
+  var g=S.g,msg=$("g-msg");
+  function fail(t){msg.textContent=t;msg.style.color="var(--bad)";}
+  var s=schoolById(g.school),k=s&&s.kelas.filter(function(x){return x.id===g.kelas;})[0];
+  if(!k)return fail("Pilih kelas.");
+  if(S.mode==="local"&&!g.pelapor.trim())return fail("Isi nama guru kelas.");
+  if(g.muslim==="")return fail("Isi jumlah siswa Muslim.");
+  if(g.bisa==="")return fail("Isi jumlah yang sudah bisa membaca (isi 0 jika belum ada).");
+  if(toInt(g.bisa)>toInt(g.muslim))return fail("Yang bisa membaca tidak boleh melebihi jumlah siswa Muslim.");
+  var docId=targetDoc(k);
+  if(!docId)return fail("Akun Anda belum dikenali, laporan tidak dapat disimpan.");
+  var key=g.school+"_"+g.kelas+"_"+g.month;
+  var entry={sekolahId:g.school,kelasId:g.kelas,kelasNama:k.nama,bulan:g.month,muslim:toInt(g.muslim),bisa:toInt(g.bisa),updatedAt:Date.now()};
+  if(S.mode==="local")entry.pelapor=g.pelapor.trim();
+  writeMyReports(docId,function(o){o[key]=entry;}).then(function(){
+    g.dirty=false;g.loadedKey="";
+    if(S.mode==="local")lsSet({pelapor:g.pelapor.trim()});
+    toast("Laporan "+k.nama+" tersimpan. Terima kasih!");render();
+  }).catch(writeFail);
+}
+function deleteReport(){
+  var g=S.g,s=schoolById(g.school),k=s.kelas.filter(function(x){return x.id===g.kelas;})[0];
+  var docId=targetDoc(k),key=g.school+"_"+g.kelas+"_"+g.month;
+  writeMyReports(docId,function(o){delete o[key];}).then(function(){g.loadedKey="";toast("Laporan dihapus");render();}).catch(writeFail);
+}
+
+/* ---------- Kelola sekolah (admin) ---------- */
+var PRESET={"SD/MI":function(){var a=[];for(var i=1;i<=6;i++)a.push("Kelas "+i);return a;},
+  "SMP/MTs":function(){return ["Kelas 7","Kelas 8","Kelas 9"];},
+  "SMA/SMK/MA":function(){return ["Kelas 10","Kelas 11","Kelas 12"];},
+  "TK/PAUD":function(){return ["Kelompok A","Kelompok B"];},
+  "Lainnya":function(){return [];}};
+function assignPanel(sc){
+  if(S.mode!=="shared")return '<div class="hint" style="margin-top:8px">Penugasan guru kelas tersedia setelah Firebase dihubungkan.</div>';
+  return '<div style="margin-top:10px"><div class="hint">Cari nama guru lalu pilih untuk menghubungkannya dengan kelas. Hanya guru tersebut yang dapat mengisi laporan kelasnya.</div>'+
+    sc.kelas.map(function(k){
+      return '<div class="as-row"><div><b>'+esc(k.nama)+'</b><div class="hint">'+(k.guruId?'Guru: '+esc(guruTxt(k)):'Belum ada guru')+'</div></div>'+
+        '<div class="as-ctl"><input type="text" class="as-q" data-sid="'+esc(sc.id)+'" data-kid="'+esc(k.id)+'" placeholder="Cari nama guru…" autocomplete="off"><div class="as-res"></div>'+
+        (k.guruId?'<div><button class="btn sm" data-action="unassign" data-sid="'+esc(sc.id)+'" data-kid="'+esc(k.id)+'">Lepas guru</button></div>':'')+'</div></div>';
+    }).join("")+'</div>';
+}
+function renderSchools(){
+  var e=S.edit;
+  var jen=Object.keys(PRESET).map(function(j){return '<option'+(e.jenjang===j?" selected":"")+'>'+esc(j)+'</option>';}).join("");
+  var items=sortedSchools().map(function(s){
+    var cd=S.confirmDel===s.id,open=S.assignOpen===s.id;
+    var withG=s.kelas.filter(function(k){return k.guruId;}).length;
+    return '<div class="school-item" style="display:block"><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><div><b>'+esc(s.nama)+'</b><div class="m">'+esc(s.jenjang)+' · '+s.kelas.length+' kelas ('+withG+' sudah ada guru): '+esc(s.kelas.map(function(k){return k.nama;}).join(", ")||"–")+'</div></div>'+
+      '<div><button class="btn sm" data-action="toggle-assign" data-id="'+esc(s.id)+'">'+(open?"Tutup":"Atur guru kelas")+'</button> '+(s.kepsekId?'<button class="btn sm" data-action="ks-remove" data-id="'+esc(s.id)+'">Lepas kepsek ('+esc(nameOf(s.kepsekId))+')</button> ':'')+'<button class="btn sm" data-action="edit-school" data-id="'+esc(s.id)+'">Ubah</button> <button class="btn sm danger" data-action="del-school" data-id="'+esc(s.id)+'">'+(cd?"Klik lagi untuk hapus":"Hapus")+'</button></div></div>'+
+      (open?assignPanel(s):'')+'</div>';
+  }).join("");
+  var form='<div class="card"><h2>'+(e.id?"Ubah sekolah":"Tambah sekolah binaan")+'</h2>'+
+    '<div class="grid2"><div class="field"><label for="e-nama">Nama sekolah</label><input type="text" id="e-nama" value="'+esc(e.nama)+'" placeholder="mis. SDN 12 Barru"></div>'+
+    '<div class="field"><label for="e-jenjang">Jenjang</label><select id="e-jenjang">'+jen+'</select></div></div>'+
+    '<div class="field" style="margin-top:10px"><label for="e-kelas">Daftar kelas (satu kelas per baris)</label><textarea id="e-kelas" placeholder="Kelas 1A&#10;Kelas 1B&#10;Kelas 2">'+esc(e.kelas)+'</textarea></div>'+
+    '<div class="bar" style="margin:10px 0 0"><button class="btn" data-action="preset">Isi otomatis sesuai jenjang</button><div class="spacer"></div>'+
+    (e.id?'<button class="btn" data-action="cancel-edit">Batal</button>':'')+
+    '<button class="btn primary" data-action="save-school">'+(e.id?"Simpan perubahan":"Tambah sekolah")+'</button></div>'+
+    '<div class="hint" style="margin-top:6px">Satu baris = satu kelas dengan satu guru pelapor. Setelah sekolah tersimpan, pakai tombol Atur guru kelas untuk menghubungkan nama guru ke tiap kelas.</div></div>';
+  $("view").innerHTML=(S.mode==="shared"?pendingCard():"")+form+'<div class="card"><h2>Sekolah binaan ('+S.schools.length+')</h2>'+(items||'<div class="empty">Belum ada sekolah.</div>')+'</div>'+(S.mode==="shared"?jsonCard():"");
+}
+function saveKelasList(sc,kelas){
+  var o={nama:sc.nama,jenjang:sc.jenjang,kelas:kelas.map(function(k){var x={id:k.id,nama:k.nama};if(k.guruId)x.guruId=k.guruId;return x;})};
+  if(sc.kepsekId)o.kepsekId=sc.kepsekId;
+  return repo.set(COL_S,sc.id,o);
+}
+function parseKelas(text,old){
+  var byName={},used={},out=[];
+  var oldBy={};
+  (old||[]).forEach(function(k){byName[k.nama]=k.id;oldBy[k.nama]=k;});
+  String(text).split(/\r?\n/).forEach(function(l){
+    l=l.trim();if(!l)return;
+    for(var i=0;i<out.length;i++)if(out[i].nama===l)return;
+    var id=byName[l]||slug(l);
+    var base=id,n=2;while(used[id]){id=base+"-"+n;n++;}
+    used[id]=1;out.push({id:id,nama:l,guruId:oldBy[l]?oldBy[l].guruId:null});
+  });
+  return out;
+}
+function saveSchool(){
+  var e=S.edit;
+  e.nama=$("e-nama").value.trim();e.jenjang=$("e-jenjang").value;e.kelas=$("e-kelas").value;
+  if(!e.nama){toast("Nama sekolah wajib diisi");return;}
+  var old=e.id?schoolById(e.id):null;
+  var kelas=parseKelas(e.kelas,old?old.kelas:[]);
+  if(!kelas.length){toast("Isi minimal satu kelas");return;}
+  var id=e.id||uid();
+  saveKelasList({id:id,nama:e.nama,jenjang:e.jenjang,kepsekId:old&&old.kepsekId},kelas).then(function(){
+    S.edit={id:null,nama:"",jenjang:"SD/MI",kelas:""};toast("Sekolah tersimpan");render();
+  }).catch(writeFail);
+}
+function deleteSchool(id){
+  repo.del(COL_S,id).then(function(){S.confirmDel=null;if(S.assignOpen===id)S.assignOpen=null;toast("Sekolah dihapus");}).catch(writeFail);
+}
+
+/* ---------- CSV ---------- */
+function csvCell(v){v=String(v==null?"":v);return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function buildCSV(onlyMonth){
+  var lines=[["Bulan","Sekolah","Jenjang","Kelas","Siswa Muslim","Bisa Membaca Al-Qur'an","Belum Bisa Membaca","Persen Bisa","Guru Pelapor","Terakhir Diperbarui"]];
+  var rs=S.reportsList.filter(function(r){return !onlyMonth||r.bulan===onlyMonth;});
+  rs.sort(function(a,b){return a.bulan!==b.bulan?(a.bulan<b.bulan?-1:1):String(a.sekolahId+a.kelasNama).localeCompare(b.sekolahId+b.kelasNama);});
+  rs.forEach(function(r){
+    var s=schoolById(r.sekolahId);if(!s||!visSchools().some(function(v){return v.id===s.id;}))return;
+    var m=toInt(r.muslim),b=Math.min(toInt(r.bisa),m),p=pct(b,m);
+    lines.push([r.bulan,s.nama,s.jenjang,r.kelasNama,m,b,m-b,p==null?"":p,reporterName(r),r.updatedAt?new Date(r.updatedAt).toISOString().slice(0,10):""]);
+  });
+  return "\ufeff"+lines.map(function(l){return l.map(csvCell).join(",");}).join("\r\n");
+}
+function exportCSV(onlyMonth){
+  if(!dl){toast("Fitur unduh tidak tersedia di tampilan ini");return;}
+  var csv=buildCSV(onlyMonth);
+  if(csv.split("\r\n").length<2){toast("Belum ada data untuk diunduh");return;}
+  dl.save({filename:"laporan-baca-quran-"+(onlyMonth||"semua-bulan")+".csv",data:csv}).then(function(){toast("File diunduh");}).catch(function(e){if(!e||e.code!=="declined")toast("Gagal mengunduh");});
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-tab],[data-action]");if(!t)return;
+  var tab=t.getAttribute("data-tab");
+  if(tab){S.tab=tab;S.confirmDel=null;render();return;}
+  var a=t.getAttribute("data-action"),id=t.getAttribute("data-id");
+  if(a==="login"||a==="login-kepsek"){
+    if(a==="login-kepsek"){S.tab="kepsek";try{sessionStorage.setItem("lapor-tab","kepsek");}catch(e){}}
+    var pr=new firebase.auth.GoogleAuthProvider();
+    window.__auth.signInWithPopup(pr).catch(function(e){
+      if(e&&(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"))window.__auth.signInWithRedirect(pr);
+      else if(!e||e.code!=="auth/popup-closed-by-user")toast("Gagal masuk"+(e&&e.code?" ("+e.code+")":""));
+    });
+  }
+  else if(a==="logout"){window.__auth.signOut().then(function(){location.reload();});}
+  else if(a==="goto-sekolah"){S.tab="sekolah";render();}
+  else if(a==="pick-school"){S.scope=id;render();}
+  else if(a==="back-all"){S.scope="all";render();}
+  else if(a==="pick-class"){S.g.kelas=id;S.g.loadedKey="";S.g.dirty=false;render();}
+  else if(a==="csv-month")exportCSV(S.month);
+  else if(a==="csv-all")exportCSV(null);
+  else if(a==="save-report")saveReport();
+  else if(a==="del-report")deleteReport();
+  else if(a==="preset"){var j=$("e-jenjang").value;S.edit.nama=$("e-nama").value;S.edit.jenjang=j;S.edit.kelas=PRESET[j]().join("\n");render();}
+  else if(a==="save-school")saveSchool();
+  else if(a==="edit-school"){var s=schoolById(id);if(s){S.edit={id:s.id,nama:s.nama,jenjang:s.jenjang||"Lainnya",kelas:s.kelas.map(function(k){return k.nama;}).join("\n")};render();window.scrollTo(0,0);}}
+  else if(a==="cancel-edit"){S.edit={id:null,nama:"",jenjang:"SD/MI",kelas:""};render();}
+  else if(a==="del-school"){if(S.confirmDel===id)deleteSchool(id);else{S.confirmDel=id;render();}}
+  else if(a==="ks-submit"){
+    var ksel=$("k-school");if(!ksel||!ksel.value)return;
+    var kc=S.regRaw[S.myId]||{};
+    repo.set(COL_P,S.myId,{requests:kc.requests||{},nama:kc.nama||S.myName||S.email||"Kepala Sekolah",kepsek:{sekolahId:ksel.value,ts:Date.now()}}).then(function(){toast("Diajukan. Menunggu validasi admin.");render();}).catch(writeFail);
+  }
+  else if(a==="ks-cancel"){
+    var kc2=S.regRaw[S.myId]||{};
+    repo.set(COL_P,S.myId,{requests:kc2.requests||{},nama:kc2.nama||S.myName||""}).then(function(){toast("Dihapus");render();}).catch(writeFail);
+  }
+  else if(a==="dn-submit")dnSubmit();
+  else if(a==="dn-cancel")dnCancel();
+  else if(a==="dn-approve")dnApprove(t.getAttribute("data-uid"));
+  else if(a==="dn-reject")dnDeny(t.getAttribute("data-uid"),"Pengajuan ditolak");
+  else if(a==="dn-revoke"){if(confirm("Cabut akses Dinas untuk akun ini?"))dnDeny(t.getAttribute("data-uid"),"Akses dicabut");}
+  else if(a==="ks-approve"){
+    var ksc=schoolById(t.getAttribute("data-sid")),kuid=t.getAttribute("data-uid");if(!ksc)return;
+    if(ksc.kepsekId&&ksc.kepsekId!==kuid){toast("Sekolah ini sudah punya kepala sekolah");return;}
+    saveKelasList(Object.assign({},ksc,{kepsekId:kuid}),ksc.kelas).then(function(){toast("Kepala sekolah disetujui");}).catch(writeFail);
+  }
+  else if(a==="ks-reject"){
+    var ku=t.getAttribute("data-uid");
+    repo.set(COL_D,ku,Object.assign(strip(S.dec[ku]),{kepsekDitolak:Date.now()})).then(function(){toast("Pendaftaran ditolak");}).catch(writeFail);
+  }
+  else if(a==="ks-remove"){
+    var rs=schoolById(id);if(!rs)return;
+    saveKelasList(Object.assign({},rs,{kepsekId:null}),rs.kelas).then(function(){toast("Kepala sekolah dilepas");}).catch(writeFail);
+  }
+  else if(a==="json-export")exportJSON();
+  else if(a==="json-import"){var jf=$("j-file");if(jf)jf.click();}
+  else if(a==="reg-submit")submitReg();
+  else if(a==="ubah-nama")submitUbah("nama");
+  else if(a==="ubah-kelas")submitUbah("kelas",t.getAttribute("data-sid"),t.getAttribute("data-kid"));
+  else if(a==="lepas")requestRelease(t.getAttribute("data-sid"),t.getAttribute("data-kid"));
+  else if(a==="reg-cancel")cancelReg(t.getAttribute("data-key"));
+  else if(a==="approve")approveReg(t.getAttribute("data-uid"),t.getAttribute("data-key"));
+  else if(a==="reject")rejectReg(t.getAttribute("data-uid"),t.getAttribute("data-key"));
+  else if(a==="toggle-assign"){S.assignOpen=S.assignOpen===id?null:id;render();}
+  else if(a==="assign"||a==="unassign"){
+    var sc=schoolById(t.getAttribute("data-sid"));if(!sc)return;
+    var kid=t.getAttribute("data-kid"),gid=t.getAttribute("data-gid");
+    if(a==="assign"){S.names[gid]=t.getAttribute("data-gname");}
+    var kl=sc.kelas.map(function(k){return k.id===kid?{id:k.id,nama:k.nama,guruId:a==="assign"?gid:null}:k;});
+    saveKelasList(sc,kl).then(function(){toast(a==="assign"?"Guru kelas ditetapkan":"Guru kelas dilepas");}).catch(writeFail);
+  }
+});
+function runSearch(inp){
+  if(!userNs)return;
+  var box=inp.parentNode.querySelector(".as-res"),sid=inp.getAttribute("data-sid"),kid=inp.getAttribute("data-kid");
+  userNs.search(inp.value.trim()).then(function(hits){
+    if(!hits||!hits.length){box.innerHTML='<span class="hint">'+(inp.value.trim()?"Tidak ada nama yang cocok.":"Ketik nama guru untuk mencari.")+'</span>';return;}
+    box.innerHTML=hits.map(function(h){return '<button class="btn sm" data-action="assign" data-sid="'+esc(sid)+'" data-kid="'+esc(kid)+'" data-gid="'+esc(h.id)+'" data-gname="'+esc(h.name)+'">'+esc(h.name)+'</button>';}).join("");
+  });
+}
+document.addEventListener("focusin",function(ev){if(ev.target.classList&&ev.target.classList.contains("as-q"))runSearch(ev.target);});
+document.addEventListener("change",function(ev){
+  var t=ev.target;
+  if(t.id==="j-file"){importJSON(t);return;}
+  if(t.id==="f-month"&&t.value){S.month=t.value;render();}
+  else if(t.id==="f-scope"){S.scope=t.value;render();}
+  else if(t.id==="g-school"){S.g.school=t.value;S.g.kelas="";S.g.loadedKey="";S.g.dirty=false;render();}
+  else if(t.id==="g-kelas"){S.g.kelas=t.value;S.g.loadedKey="";S.g.dirty=false;render();}
+  else if(t.id==="r-school"){S.reg.school=t.value;S.reg.sel={};render();}
+  else if(t.getAttribute&&t.getAttribute("data-rk")){var rk=t.getAttribute("data-rk");if(t.checked)S.reg.sel[rk]=1;else delete S.reg.sel[rk];}
+  else if(t.id==="g-month"&&t.value){S.g.month=t.value;S.g.loadedKey="";S.g.dirty=false;render();}
+});
+document.addEventListener("input",function(ev){
+  var t=ev.target,g=S.g;
+  if(t.classList&&t.classList.contains("as-q")){runSearch(t);return;}
+  if(t.id==="r-extra"){S.reg.extra=t.value;return;}
+  if(t.id==="r-nama"){S.reg.nama=t.value;return;}
+  if(t.id==="p-nama"){S.prof.nama=t.value;S.prof.nd=true;return;}
+  if(t.id==="dn-nama"){S.dn.nama=t.value;return;}
+  if(t.id==="dn-inst"){S.dn.inst=t.value;return;}
+  if(t.classList&&t.classList.contains("p-k")){S.prof.k[t.getAttribute("data-sid")+"_"+t.getAttribute("data-kid")]=t.value;return;}
+  if(t.id==="g-muslim"){g.muslim=t.value;g.dirty=true;g.prefilled=false;updG();}
+  else if(t.id==="g-bisa"){g.bisa=t.value;g.dirty=true;updG();}
+  else if(t.id==="g-pelapor"){g.pelapor=t.value;g.dirty=true;}
+  else return;
+  var msg=$("g-msg");if(msg)msg.textContent="";
+});
+
+/* ---------- data wiring ---------- */
+function collectIds(){
+  if(S.ownOnly)return S.myId?[S.myId]:[];
+  var ids={};
+  if(S.myId)ids[S.myId]=1;
+  S.schools.forEach(function(sc){sc.kelas.forEach(function(k){if(k.guruId)ids[k.guruId]=1;});});
+  Object.keys(S.raw).forEach(function(id){if(id!=="lokal")ids[id]=1;});
+  Object.keys(S.regRaw).forEach(function(id){ids[id]=1;});
+  return Object.keys(ids);
+}
+async function resolveNames(){
+  if(!userNs)return;
+  var need=collectIds().filter(function(id){return !S.names[id]&&!typedName(id);});
+  if(!need.length)return;
+  try{
+    var ps=await userNs.profiles(need);
+    need.forEach(function(id){if(ps[id]&&ps[id].name)S.names[id]=ps[id].name;});
+  }catch(e){}
+}
+function rebuildReports(){
+  var best={};
+  Object.keys(S.raw).forEach(function(uid){
+    var rs=(S.raw[uid]&&S.raw[uid].reports)||{};
+    Object.keys(rs).forEach(function(key){
+      var r=rs[key];if(!r||!r.sekolahId)return;
+      var sc=schoolById(r.sekolahId);if(!sc)return;
+      var k=sc.kelas.filter(function(x){return x.id===r.kelasId;})[0];if(!k)return;
+      if(S.mode==="shared"&&k.guruId&&k.guruId!==uid)return;
+      var kk=r.sekolahId+"_"+r.kelasId+"_"+r.bulan;
+      var c=Object.assign({},r);c._by=uid;
+      if(!best[kk]||(c.updatedAt||0)>(best[kk].updatedAt||0))best[kk]=c;
+    });
+  });
+  S.reports=best;
+  S.reportsList=Object.keys(best).map(function(k){return best[k];});
+}
+function onData(){
+  if(!(loaded.sekolah&&loaded.laporan&&loaded.p&&loaded.d))return;
+  rebuildReports();
+  var go=function(){
+    S.ready=true;
+    if(!S._tabSet){S._tabSet=1;if(S.mode==="shared"&&!S.canAdmin&&managed().length)S.tab="ringkas";}
+    rebuildReports();
+    var ae=document.activeElement;
+    if(S.tab==="sekolah"&&ae&&((ae.classList&&ae.classList.contains("as-q"))||/^e-/.test(ae.id||"")))return;
+    if(S.tab==="input"&&S.g.dirty)return;
+    if(ae&&(ae.id==="r-extra"||ae.id==="r-nama"||ae.id==="p-nama"||ae.id==="dn-nama"||ae.id==="dn-inst"||(ae.classList&&ae.classList.contains("p-k"))))return;
+    render();
+  };
+  if(userNs&&collectIds().some(function(id){return !S.names[id];}))resolveNames().then(go);else go();
+}
+function start(){
+  var saved=lsGet();
+  if(saved.pelapor)S.g.pelapor=saved.pelapor;
+  render();
+  (async function(){
+    var db=null;
+    try{
+      if(window.claude&&window.claude.use){
+        db=await window.claude.use("db");
+        userNs=await window.claude.use("user");
+        dl=await window.claude.use("downloads");
+      }
+    }catch(e){}
+    if(!db&&fbOn()){
+      try{var fb=await fbStart();db=fb.db;userNs=fb.user;dl=fb.dl;}
+      catch(e){toast("Gagal masuk ke Firebase"+(e&&e.code?" ("+e.code+")":""));}
+    }
+    if(userNs){
+      try{var c=await userNs.can("data.write");S.canWrite=c!==false;}catch(e){}
+      try{S.canAdmin=!!(await userNs.canEdit());}catch(e){}
+      try{var me=await userNs.me();S.myId=me.id||null;S.myName=me.name||"";if(S.myId&&S.myName)S.names[S.myId]=S.myName;}catch(e){}
+    }
+    S.mode=db?"shared":"local";
+    if(!db)S.canAdmin=true;
+    var st0=null;try{st0=sessionStorage.getItem("lapor-tab");sessionStorage.removeItem("lapor-tab");}catch(e){}
+    if(db&&S.canAdmin)S.tab="ringkas";else if(st0)S.tab=st0;
+    repo=db?dbRepo(db):localRepo();
+    var hR=function(l){var m={};l.forEach(function(d){m[d.id]=d;});S.raw=m;loaded.laporan=true;onData();};
+    var hP=function(l){var m={};l.forEach(function(d){m[d.id]=d;});S.regRaw=m;loaded.p=true;onData();};
+    var hD=function(l){var m={};l.forEach(function(d){m[d.id]=d;});S.dec=m;loaded.d=true;onData();};
+    var hN=function(l){
+      var m={};l.forEach(function(d){m[d.id]=d;});S.dinasRaw=m;
+      if(!S.canAdmin&&S.myId&&m[S.myId]&&m[S.myId].aktif===true){if(!S._dn){S._dn=1;S.tab="ringkas";}if(scope!=="full")wire(true);}
+      onData();
+    };
+    var scope=null,unsubs=[];
+    /* admin & kepala sekolah memuat semua data; guru biasa hanya datanya sendiri */
+    function wire(full){
+      var want=full?"full":"own";
+      if(scope===want)return;
+      unsubs.forEach(function(u){if(u)u();});unsubs=[];
+      scope=want;S.ownOnly=!full;
+      loaded.laporan=false;loaded.p=false;loaded.d=false;
+      if(full){
+        unsubs.push(repo.subscribe(COL_R,hR));
+        if(db){unsubs.push(repo.subscribe(COL_P,hP));unsubs.push(repo.subscribe(COL_D,hD));unsubs.push(S.canAdmin?repo.subscribe(COL_N,hN):repo.subscribeDoc(COL_N,S.myId,hN));}
+        else{loaded.p=true;loaded.d=true;}
+      }else{
+        unsubs.push(repo.subscribeDoc(COL_R,S.myId,hR));
+        unsubs.push(repo.subscribeDoc(COL_P,S.myId,hP));
+        unsubs.push(repo.subscribeDoc(COL_D,S.myId,hD));
+        unsubs.push(repo.subscribeDoc(COL_N,S.myId,hN));
+      }
+    }
+    repo.subscribe(COL_S,function(l){
+      S.schools=l.map(normSchool);loaded.sekolah=true;
+      wire(!db||!S.myId||S.canAdmin||managed().length>0);
+      onData();
+    });
+  })();
+}
+start();
+})();
+</script>
+</body>
+</html>
